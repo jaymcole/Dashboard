@@ -2,13 +2,16 @@ package dashboard.apps;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Matrix4;
 import dashboard.dataObjects.RenderInfo;
 import dashboard.dataObjects.UpdateInfo;
 
-public class BaseApp implements IDashboardApp {
+public abstract class BaseApp implements IDashboardApp {
 
+    protected String appName = "DefaultAppName";
     protected SpriteBatch spriteBatch;
     protected ShapeRenderer shapeRenderer;
+    protected Matrix4 matrix = new Matrix4();
 
     public BaseApp() {
         spriteBatch = new SpriteBatch();
@@ -16,12 +19,12 @@ public class BaseApp implements IDashboardApp {
     }
 
     @Override
-    public void update(UpdateInfo updateInfo) {
-
-    }
+    public abstract void update(UpdateInfo updateInfo);
 
     @Override
-    public void render(RenderInfo renderInfo) {
+    public abstract void render(RenderInfo renderInfo);
 
+    protected void renderAppName(RenderInfo renderInfo) {
+        renderInfo.debugFont.draw(spriteBatch, appName, 5, renderInfo.maxHeight - (renderInfo.debugFont.getXHeight()));
     }
 }
