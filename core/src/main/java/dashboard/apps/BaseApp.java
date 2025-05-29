@@ -25,6 +25,10 @@ public abstract class BaseApp implements IDashboardApp {
     public abstract void render(RenderInfo renderInfo);
 
     protected void renderAppName(RenderInfo renderInfo) {
-        renderInfo.debugFont.draw(spriteBatch, appName, 5, renderInfo.maxHeight - (renderInfo.debugFont.getXHeight()));
+        if (spriteBatch.isDrawing()) {
+            renderInfo.debugFont.draw(spriteBatch, appName, 5, renderInfo.maxHeight - (renderInfo.debugFont.getXHeight()));
+        } else {
+            System.err.println("renderAppName was called before spriteBatch.begin() !!!");
+        }
     }
 }
