@@ -87,69 +87,54 @@ public class Home implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        String lastAppRendered = "";
-        String lastAppUpdated = "";
-        RenderInfo renderInfo = new RenderInfo();
-        UpdateInfo updateInfo = new UpdateInfo();
-        updateInfo.delta = delta;
-        // Render each app to its own framebuffer offscreen
-        // This is done so that app don't need to know where they sit on the home page. All rendering can be done from x=0, y=0.
-        // The framebuffer will later be pasted in the correct position on the home page
         for(AppInfo info : apps) {
-            info.frameBuffer.begin();
-            renderInfo.debugFont = debugFont;
             if (!brokenApps.contains(info)) {
-                spriteBatch.setColor(Color.WHITE);
-                Gdx.gl.glClearColor(0, 0, 0, 0);
-                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-                try {
-                    lastAppUpdated = info.app.getAppName();
-                    info.app.update(updateInfo);
-                } catch (Exception e) {
-                    String errorMessage = lastAppUpdated + ": " + e.getMessage();
-                    info.registerErrorMessage(errorMessage);
-                    brokenApps.add(info);
-                }
-
-                // If one of the apps fails for any reason, don't block other apps
-                try {
-                    lastAppRendered = info.app.getAppName();
-                    info.app.renderDebugBackground(renderInfo);
-                    info.app.render(renderInfo);
-                    info.app.renderDebugForeground(renderInfo);
-                } catch (Exception e) {
-                    String errorMessage = lastAppUpdated + ": " + e.getMessage();
-                    info.registerErrorMessage(errorMessage);
-                    brokenApps.add(info);
-                }
+                updateApp(info, delta);
+                renderAppToFrameBuffer(info);
             } else {
-
                 renderAppErrors(info);
             }
+        }
+        renderAppsToHomeScreen();
+    }
 
-            info.frameBuffer.end();
+    private void updateApp(AppInfo info, float delta) {
+        UpdateInfo updateInfo = new UpdateInfo();
+        updateInfo.delta = delta;
+
+        try {
+            info.app.update(updateInfo);
+        } catch (Exception e) {
+            String errorMessage = info.app.getAppName() + ": " + e.getMessage();
+            info.registerErrorMessage(errorMessage);
+            brokenApps.add(info);
+        }
+    }
+
+    private void renderAppToFrameBuffer(AppInfo info) {
+        RenderInfo renderInfo = new RenderInfo();
+
+        info.frameBuffer.begin();
+        renderInfo.debugFont = debugFont;
+
+        spriteBatch.setColor(Color.WHITE);
+        Gdx.gl.glClearColor(0, 0, 0, 0);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+
+        // If one of the apps fails for any reason, don't block other apps
+        try {
+            info.app.renderDebugBackground(renderInfo);
+            info.app.render(renderInfo);
+            info.app.renderDebugForeground(renderInfo);
+        } catch (Exception e) {
+            String errorMessage = info.app.getAppName() + ": " + e.getMessage();
+            info.registerErrorMessage(errorMessage);
+            brokenApps.add(info);
         }
 
-        // Render all framebuffers to screen in their correct locations
-        matrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
-        spriteBatch.setProjectionMatrix(matrix);
-        spriteBatch.begin();
-        for(AppInfo info : apps) {
-            TextureRegion textureRegion = new TextureRegion(info.frameBuffer.getColorBufferTexture());
-            textureRegion.flip(false, true);
-            if (info.hasErrorMessages()) {
-                spriteBatch.setColor(Color.RED);
-            } else {
-                spriteBatch.setColor(Color.WHITE);
-            }
-            spriteBatch.draw(
-                textureRegion,
-                info.xScreenCoordinate + (appPadding / 2.0f),
-                info.yScreenCoordinate + (appPadding / 2.0f)
-            );
-        }
-        spriteBatch.end();
+        info.frameBuffer.end();
+
     }
 
     private void renderAppErrors(AppInfo info) {
@@ -165,8 +150,31 @@ public class Home implements Screen {
         shapeRenderer.setColor(Color.WHITE);
         info.app.getBounds().render(shapeRenderer);
         shapeRenderer.end();
-
     }
+
+     private void renderAppsToHomeScreen() {
+        // Render all framebuffers to screen in their correct locations
+         matrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+         spriteBatch.setProjectionMatrix(matrix);
+         spriteBatch.begin();
+         for(AppInfo info : apps) {
+             TextureRegion textureRegion = new TextureRegion(info.frameBuffer.getColorBufferTexture());
+             textureRegion.flip(false, true);
+             if (info.hasErrorMessages()) {
+                 spriteBatch.setColor(Color.RED);
+             } else {
+                 spriteBatch.setColor(Color.WHITE);
+             }
+             spriteBatch.draw(
+                 textureRegion,
+                 info.xScreenCoordinate + (appPadding / 2.0f),
+                 info.yScreenCoordinate + (appPadding / 2.0f)
+             );
+         }
+         spriteBatch.end();
+     }
+
+
 
     private void renderDebugCellBorders() {
         spriteBatch.begin();
