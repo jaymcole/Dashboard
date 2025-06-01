@@ -13,11 +13,9 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
-import dashboard.apps.BaseApp;
 import dashboard.apps.bouncingBalls.BouncingBallsApp;
 import dashboard.apps.clockApp.ClockApp;
 import dashboard.apps.testApps.BoundingBoxTestApp;
-import dashboard.apps.testApps.DebugBordersApp;
 import dashboard.apps.testApps.TextureTestApp;
 import dashboard.miscDataObjects.AppInfo;
 import dashboard.miscDataObjects.RenderInfo;
@@ -26,6 +24,7 @@ import dashboard.miscDataObjects.UpdateInfo;
 import dashboard.rendering.BoundingBox;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /** First screen of the application. Displayed after the application is created. */
@@ -34,12 +33,15 @@ public class Home implements Screen {
     private SpriteBatch spriteBatch;
     private ShapeRenderer shapeRenderer;
     private List<AppInfo> apps;
+    private HashSet<AppInfo> brokenApps;
     private Matrix4 matrix = new Matrix4();
     private BitmapFont debugFont;
     private final int appPadding = 10;
 
+
     @Override
     public void show() {
+        brokenApps = new HashSet<>();
         shapeRenderer = new ShapeRenderer();
         spriteBatch = new SpriteBatch();
 
@@ -55,6 +57,7 @@ public class Home implements Screen {
         apps.add(new AppInfo(new ClockApp(), 0,0,1,1));
         apps.add(new AppInfo(new BoundingBoxTestApp(), 1,0,1,1));
         apps.add(new AppInfo(new TextureTestApp(libgdxTestTexture), 0,1,2,1));
+        apps.add(new AppInfo(new BouncingBallsApp(), 2,1,1,1));
         apps.add(new AppInfo(new BouncingBallsApp(), 0,2,3,1));
         apps.add(new AppInfo(new TextureTestApp(libgdxTestTexture), 2,0,1,1));
         calculateAppInfo();
@@ -95,26 +98,34 @@ public class Home implements Screen {
         // The framebuffer will later be pasted in the correct position on the home page
         for(AppInfo info : apps) {
             info.frameBuffer.begin();
-            Gdx.gl.glClearColor(0, 0, 0, 0);
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
             renderInfo.debugFont = debugFont;
+            if (!brokenApps.contains(info)) {
+                spriteBatch.setColor(Color.WHITE);
+                Gdx.gl.glClearColor(0, 0, 0, 0);
+                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+                try {
+                    lastAppUpdated = info.app.getAppName();
+                    info.app.update(updateInfo);
+                } catch (Exception e) {
+                    String errorMessage = lastAppUpdated + ": " + e.getMessage();
+                    info.registerErrorMessage(errorMessage);
+                    brokenApps.add(info);
+                }
 
-            try {
-                lastAppUpdated = info.app.getClass().toGenericString();
-                info.app.update(updateInfo);
-            } catch (Exception e) {
-                System.err.println("Something broke trying to update" + lastAppUpdated + ": " + e.getMessage());
-            }
+                // If one of the apps fails for any reason, don't block other apps
+                try {
+                    lastAppRendered = info.app.getAppName();
+                    info.app.renderDebugBackground(renderInfo);
+                    info.app.render(renderInfo);
+                    info.app.renderDebugForeground(renderInfo);
+                } catch (Exception e) {
+                    String errorMessage = lastAppUpdated + ": " + e.getMessage();
+                    info.registerErrorMessage(errorMessage);
+                    brokenApps.add(info);
+                }
+            } else {
 
-            // If one of the apps fails for any reason, don't block other apps
-            try {
-                lastAppRendered = info.app.getClass().toGenericString();
-                info.app.renderDebugBackground(renderInfo);
-                info.app.render(renderInfo);
-                info.app.renderDebugForeground(renderInfo);
-            } catch (Exception e) {
-                System.err.println("Something broke trying to render" + lastAppRendered + ": " + e.getMessage());
+                renderAppErrors(info);
             }
 
             info.frameBuffer.end();
@@ -127,6 +138,11 @@ public class Home implements Screen {
         for(AppInfo info : apps) {
             TextureRegion textureRegion = new TextureRegion(info.frameBuffer.getColorBufferTexture());
             textureRegion.flip(false, true);
+            if (info.hasErrorMessages()) {
+                spriteBatch.setColor(Color.RED);
+            } else {
+                spriteBatch.setColor(Color.WHITE);
+            }
             spriteBatch.draw(
                 textureRegion,
                 info.xScreenCoordinate + (appPadding / 2.0f),
@@ -134,8 +150,22 @@ public class Home implements Screen {
             );
         }
         spriteBatch.end();
+    }
 
-//        renderDebugCellBorders();
+    private void renderAppErrors(AppInfo info) {
+        matrix.setToOrtho2D(0, 0, info.app.getBounds().getWidth(), info.app.getBounds().getHeight());
+        spriteBatch.setProjectionMatrix(matrix);
+        spriteBatch.setColor(Color.WHITE);
+        spriteBatch.begin();
+        info.renderErrorMessages(spriteBatch);
+        spriteBatch.end();
+
+        shapeRenderer.setProjectionMatrix(matrix);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(Color.WHITE);
+        info.app.getBounds().render(shapeRenderer);
+        shapeRenderer.end();
+
     }
 
     private void renderDebugCellBorders() {
@@ -169,6 +199,11 @@ public class Home implements Screen {
 
         // Resize your screen here. The parameters represent the new window size.
         calculateAppInfo();
+        for(AppInfo info : apps) {
+            if (info.hasErrorMessages()) {
+                info.resizeErrorMessage();
+            }
+        }
     }
 
     @Override

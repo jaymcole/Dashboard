@@ -34,14 +34,14 @@ public class BouncingBallsApp extends BaseApp {
             directionY -= 9.8f;
 
 
-            if (x < bounds.getX()) {
+            if (x < bounds.getX() + size) {
                 directionX *= -1;
-                x = bounds.getX();
+                x = bounds.getX() + size;
                 directionX *= 1.2f;
 
-            } else if (x > bounds.getX() + bounds.getWidth()) {
+            } else if (x > bounds.getX() + bounds.getWidth() - size) {
                 directionX *= -1;
-                x = bounds.getX() + bounds.getWidth();
+                x = bounds.getX() + bounds.getWidth() - size;
                 directionX *= 1.2f;
 
             }
@@ -50,10 +50,10 @@ public class BouncingBallsApp extends BaseApp {
                 directionX *= 0.1f;
             }
 
-            if (y < bounds.getY()) {
+            if (y < bounds.getY() + size) {
                 directionY *= -1;
                 directionY *= 0.95f;
-                y = bounds.getY() + 1;
+                y = bounds.getY() + 1 + size;
             }
         }
 
@@ -88,6 +88,10 @@ public class BouncingBallsApp extends BaseApp {
         for(Ball ball : balls) {
             ball.update(updateInfo.delta);
         }
+        // Randomly break app
+//        if (random.nextInt(1000) < 3) {
+//            random = null;
+//        }
     }
 
     @Override
@@ -103,14 +107,6 @@ public class BouncingBallsApp extends BaseApp {
             ball.render(shapeRenderer);
         }
         shapeRenderer.end();
-
-        shapeRenderer.setProjectionMatrix(matrix);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-//        for(Ball ball : balls) {
-//            shapeRenderer.rect(ball.bounds.getX(), ball.bounds.getY(), ball.bounds.getWidth(), ball.bounds.getHeight());
-//        }
-        shapeRenderer.end();
-
     }
 
     @Override

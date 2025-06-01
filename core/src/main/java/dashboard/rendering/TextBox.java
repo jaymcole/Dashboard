@@ -18,7 +18,6 @@ public class TextBox {
     private String text;
 
     private GlyphLayout layout;
-//    float textWidth = layout.width;
 
     private float textX;
     private float textY;
@@ -81,10 +80,13 @@ public class TextBox {
                 tooLarge = currentFontSize;
             } else if (layout.height <= bounds.getWidth() || layout.height <= bounds.getHeight()) {
                 tooSmall = currentFontSize;
-            } else {
-                break;
             }
-            System.out.println("Trying size: " + currentFontSize + " for text: " + text);
+            System.out.println("Text: " + text + " layout.width: " + layout.width + " bounds.getWidth: " + bounds.getWidth());
+        }
+
+        if (layout.width > bounds.getWidth()) {
+            currentFontSize--;
+            this.font = FontHelper.loadFont(fontFilePath, currentFontSize);
         }
     }
 
