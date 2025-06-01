@@ -1,4 +1,4 @@
-package dashboard.dataObjects;
+package dashboard.miscDataObjects;
 
 public class Tuple <T, E> {
     public T left;

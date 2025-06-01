@@ -3,6 +3,7 @@ package dashboard.main;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -12,11 +13,17 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
+import dashboard.apps.BaseApp;
+import dashboard.apps.bouncingBalls.BouncingBallsApp;
+import dashboard.apps.clockApp.ClockApp;
+import dashboard.apps.testApps.BoundingBoxTestApp;
 import dashboard.apps.testApps.DebugBordersApp;
 import dashboard.apps.testApps.TextureTestApp;
-import dashboard.dataObjects.AppInfo;
-import dashboard.dataObjects.RenderInfo;
-import dashboard.dataObjects.Tuple;
+import dashboard.miscDataObjects.AppInfo;
+import dashboard.miscDataObjects.RenderInfo;
+import dashboard.miscDataObjects.Tuple;
+import dashboard.miscDataObjects.UpdateInfo;
+import dashboard.rendering.BoundingBox;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,21 +43,21 @@ public class Home implements Screen {
         shapeRenderer = new ShapeRenderer();
         spriteBatch = new SpriteBatch();
 
-        Texture libgdxTestTexture = new Texture(Gdx.files.internal("libgdx128.png"));
-
-        apps = new ArrayList<>();
-        apps.add(new AppInfo(new DebugBordersApp(Color.BLUE), 0,0,1,1));
-        apps.add(new AppInfo(new TextureTestApp(libgdxTestTexture), 0,1,2,1));
-        apps.add(new AppInfo(new DebugBordersApp(Color.YELLOW), 0,2,3,1));
-        apps.add(new AppInfo(new TextureTestApp(libgdxTestTexture), 2,0,1,1));
-        calculateAppInfo();
-
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Roboto-Regular.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 12;
         debugFont = generator.generateFont(parameter); // font size 12 pixels
         generator.dispose(); // don't forget to dispose to avoid memory leaks!
 
+        Texture libgdxTestTexture = new Texture(Gdx.files.internal("libgdx128.png"));
+
+        apps = new ArrayList<>();
+        apps.add(new AppInfo(new ClockApp(), 0,0,1,1));
+        apps.add(new AppInfo(new BoundingBoxTestApp(), 1,0,1,1));
+        apps.add(new AppInfo(new TextureTestApp(libgdxTestTexture), 0,1,2,1));
+        apps.add(new AppInfo(new BouncingBallsApp(), 0,2,3,1));
+        apps.add(new AppInfo(new TextureTestApp(libgdxTestTexture), 2,0,1,1));
+        calculateAppInfo();
     }
 
     private void calculateAppInfo() {
@@ -62,25 +69,54 @@ public class Home implements Screen {
             info.xScreenCoordinate = info.xCell * cellWidth;
             info.yScreenCoordinate = info.yCell * cellHeight;
 
-            info.maxScreenWidth = (info.xCellCount * cellWidth) - appPadding;
-            info.maxScreenHeight = (info.yCellCount * cellHeight) - appPadding;
-            info.frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, info.maxScreenWidth, info.maxScreenHeight, false);
+            BoundingBox appBounds = new BoundingBox(
+                0,
+                0,
+                (info.xCellCount * cellWidth) - appPadding,
+                (info.yCellCount * cellHeight) - appPadding
+            );
+            info.app.setNewBounds(appBounds);
+            info.frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, (int)appBounds.getWidth(), (int)appBounds.getHeight(), false);
         }
     }
 
     @Override
     public void render(float delta) {
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        String lastAppRendered = "";
+        String lastAppUpdated = "";
         RenderInfo renderInfo = new RenderInfo();
+        UpdateInfo updateInfo = new UpdateInfo();
+        updateInfo.delta = delta;
         // Render each app to its own framebuffer offscreen
         // This is done so that app don't need to know where they sit on the home page. All rendering can be done from x=0, y=0.
         // The framebuffer will later be pasted in the correct position on the home page
         for(AppInfo info : apps) {
             info.frameBuffer.begin();
-            renderInfo.maxWidth = info.maxScreenWidth;
-            renderInfo.maxHeight = info.maxScreenHeight;
+            Gdx.gl.glClearColor(0, 0, 0, 0);
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
             renderInfo.debugFont = debugFont;
-            info.app.render(renderInfo);
+
+            try {
+                lastAppUpdated = info.app.getClass().toGenericString();
+                info.app.update(updateInfo);
+            } catch (Exception e) {
+                System.err.println("Something broke trying to update" + lastAppUpdated + ": " + e.getMessage());
+            }
+
+            // If one of the apps fails for any reason, don't block other apps
+            try {
+                lastAppRendered = info.app.getClass().toGenericString();
+                info.app.renderDebugBackground(renderInfo);
+                info.app.render(renderInfo);
+                info.app.renderDebugForeground(renderInfo);
+            } catch (Exception e) {
+                System.err.println("Something broke trying to render" + lastAppRendered + ": " + e.getMessage());
+            }
+
             info.frameBuffer.end();
         }
 
@@ -93,13 +129,13 @@ public class Home implements Screen {
             textureRegion.flip(false, true);
             spriteBatch.draw(
                 textureRegion,
-                info.xScreenCoordinate + (appPadding / 2),
-                info.yScreenCoordinate + (appPadding / 2)
+                info.xScreenCoordinate + (appPadding / 2.0f),
+                info.yScreenCoordinate + (appPadding / 2.0f)
             );
         }
         spriteBatch.end();
 
-        renderDebugCellBorders();
+//        renderDebugCellBorders();
     }
 
     private void renderDebugCellBorders() {
@@ -132,6 +168,7 @@ public class Home implements Screen {
         if(width <= 0 || height <= 0) return;
 
         // Resize your screen here. The parameters represent the new window size.
+        calculateAppInfo();
     }
 
     @Override
