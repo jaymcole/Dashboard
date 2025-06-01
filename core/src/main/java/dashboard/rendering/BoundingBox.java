@@ -1,7 +1,7 @@
 package dashboard.rendering;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import dashboard.miscDataObjects.Coordinate2D;
 
 public class BoundingBox {
     private final float x, y, width, height;
@@ -30,6 +30,16 @@ public class BoundingBox {
         if (shapeRenderer.isDrawing()) {
             shapeRenderer.rect(x+1, y+1, width-2, height-2);
         }
+    }
+
+    public boolean isPointInBounds(Coordinate2D point) {
+        if (point.getX() < x || point.getX() > x + width) {
+            return false;
+        }
+        if (point.getY() < y || point.getY() > y + height) {
+            return false;
+        }
+        return true;
     }
 
     public float getX() {

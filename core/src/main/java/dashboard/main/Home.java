@@ -17,15 +17,14 @@ import dashboard.apps.bouncingBalls.BouncingBallsApp;
 import dashboard.apps.clockApp.ClockApp;
 import dashboard.apps.testApps.BoundingBoxTestApp;
 import dashboard.apps.testApps.TextureTestApp;
-import dashboard.miscDataObjects.AppInfo;
-import dashboard.miscDataObjects.RenderInfo;
-import dashboard.miscDataObjects.Tuple;
-import dashboard.miscDataObjects.UpdateInfo;
+import dashboard.miscDataObjects.*;
 import dashboard.rendering.BoundingBox;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+
+import static dashboard.miscDataObjects.AppInfo.APP_PADDING;
 
 /** First screen of the application. Displayed after the application is created. */
 public class Home implements Screen {
@@ -36,7 +35,6 @@ public class Home implements Screen {
     private HashSet<AppInfo> brokenApps;
     private Matrix4 matrix = new Matrix4();
     private BitmapFont debugFont;
-    private final int appPadding = 10;
 
 
     @Override
@@ -69,17 +67,14 @@ public class Home implements Screen {
         int cellHeight = Gdx.graphics.getHeight() / horizontalVerticalCellCounts.right;
 
         for(AppInfo info : apps) {
-            info.xScreenCoordinate = info.xCell * cellWidth;
-            info.yScreenCoordinate = info.yCell * cellHeight;
+            info.resize(new BoundingBox(
+                info.xCell * cellWidth,
+                info.yCell * cellHeight,
+                info.xCellCount * cellWidth,
+                info.yCellCount * cellHeight
+            ));
 
-            BoundingBox appBounds = new BoundingBox(
-                0,
-                0,
-                (info.xCellCount * cellWidth) - appPadding,
-                (info.yCellCount * cellHeight) - appPadding
-            );
-            info.app.setNewBounds(appBounds);
-            info.frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, (int)appBounds.getWidth(), (int)appBounds.getHeight(), false);
+            info.frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, (int)info.app.getBounds().getWidth(), (int)info.app.getBounds().getHeight(), false);
         }
     }
 
@@ -96,6 +91,7 @@ public class Home implements Screen {
             }
         }
         renderAppsToHomeScreen();
+        renderOptionsButtonBoundingBoxes();
     }
 
     private void updateApp(AppInfo info, float delta) {
@@ -103,6 +99,7 @@ public class Home implements Screen {
         updateInfo.delta = delta;
 
         try {
+            info.update();
             info.app.update(updateInfo);
         } catch (Exception e) {
             String errorMessage = info.app.getAppName() + ": " + e.getMessage();
@@ -113,16 +110,11 @@ public class Home implements Screen {
 
     private void renderAppToFrameBuffer(AppInfo info) {
         RenderInfo renderInfo = new RenderInfo();
-
         info.frameBuffer.begin();
         renderInfo.debugFont = debugFont;
-
         spriteBatch.setColor(Color.WHITE);
         Gdx.gl.glClearColor(0, 0, 0, 0);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-
-        // If one of the apps fails for any reason, don't block other apps
         try {
             info.app.renderDebugBackground(renderInfo);
             info.app.render(renderInfo);
@@ -132,9 +124,7 @@ public class Home implements Screen {
             info.registerErrorMessage(errorMessage);
             brokenApps.add(info);
         }
-
         info.frameBuffer.end();
-
     }
 
     private void renderAppErrors(AppInfo info) {
@@ -167,14 +157,35 @@ public class Home implements Screen {
              }
              spriteBatch.draw(
                  textureRegion,
-                 info.xScreenCoordinate + (appPadding / 2.0f),
-                 info.yScreenCoordinate + (appPadding / 2.0f)
+                 info.getScreenCoordinates().getX() + (APP_PADDING / 2.0f),
+                 info.getScreenCoordinates().getY() + (APP_PADDING / 2.0f)
              );
          }
          spriteBatch.end();
      }
 
+    private void renderOptionsButtonBoundingBoxes() {
+        matrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        shapeRenderer.setProjectionMatrix(matrix);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(Color.WHITE);
 
+        for(AppInfo info : apps) {
+            shapeRenderer.setColor(Color.BLUE);
+            if (info.cursorOverApp) {
+                shapeRenderer.setColor(Color.GREEN);
+            }
+            info.getBounds().render(shapeRenderer);
+
+            shapeRenderer.setColor(Color.BLUE);
+            if (info.cursorOverOptions) {
+                shapeRenderer.setColor(Color.GREEN);
+            }
+            info.optionsButton.render(shapeRenderer);
+        }
+
+        shapeRenderer.end();
+    }
 
     private void renderDebugCellBorders() {
         spriteBatch.begin();
@@ -207,11 +218,6 @@ public class Home implements Screen {
 
         // Resize your screen here. The parameters represent the new window size.
         calculateAppInfo();
-        for(AppInfo info : apps) {
-            if (info.hasErrorMessages()) {
-                info.resizeErrorMessage();
-            }
-        }
     }
 
     @Override
