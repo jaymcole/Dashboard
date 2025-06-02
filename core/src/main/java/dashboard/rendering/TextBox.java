@@ -1,12 +1,9 @@
 package dashboard.rendering;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import dashboard.apps.helper.FontHelper;
-import dashboard.enums.TextHorizontalAlignment;
+import dashboard.helper.FontHelper;
 import dashboard.miscDataObjects.TextParameters;
 
 public class TextBox {

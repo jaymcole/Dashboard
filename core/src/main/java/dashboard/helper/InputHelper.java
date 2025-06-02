@@ -1,4 +1,4 @@
-package dashboard.apps.helper;
+package dashboard.helper;
 
 import com.badlogic.gdx.Gdx;
 import dashboard.miscDataObjects.Coordinate2D;

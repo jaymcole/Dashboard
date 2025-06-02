@@ -3,7 +3,7 @@ package dashboard.apps.clockApp;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import dashboard.apps.BaseApp;
-import dashboard.apps.helper.StringHelper;
+import dashboard.helper.StringHelper;
 import dashboard.miscDataObjects.RenderInfo;
 import dashboard.miscDataObjects.UpdateInfo;
 import dashboard.rendering.BoundingBox;

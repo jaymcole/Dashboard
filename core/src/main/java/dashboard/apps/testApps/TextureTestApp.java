@@ -1,5 +1,6 @@
 package dashboard.apps.testApps;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import dashboard.apps.BaseApp;
 import dashboard.miscDataObjects.RenderInfo;
@@ -9,9 +10,9 @@ public class TextureTestApp extends BaseApp {
 
     private final Texture texture;
 
-    public TextureTestApp(Texture texture) {
+    public TextureTestApp() {
         super();
-        this.texture = texture;
+        this.texture = new Texture(Gdx.files.internal("libgdx128.png"));
     }
 
     @Override

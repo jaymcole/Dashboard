@@ -5,7 +5,6 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -13,13 +12,11 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
-import dashboard.apps.bouncingBalls.BouncingBallsApp;
-import dashboard.apps.clockApp.ClockApp;
-import dashboard.apps.testApps.BoundingBoxTestApp;
-import dashboard.apps.testApps.TextureTestApp;
+import dashboard.helper.AppLoader;
 import dashboard.miscDataObjects.*;
 import dashboard.rendering.BoundingBox;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -49,16 +46,13 @@ public class Home implements Screen {
         debugFont = generator.generateFont(parameter); // font size 12 pixels
         generator.dispose(); // don't forget to dispose to avoid memory leaks!
 
-        Texture libgdxTestTexture = new Texture(Gdx.files.internal("libgdx128.png"));
-
         apps = new ArrayList<>();
-        apps.add(new AppInfo(new ClockApp(), 0,0,1,1));
-        apps.add(new AppInfo(new BoundingBoxTestApp(), 1,0,1,1));
-        apps.add(new AppInfo(new TextureTestApp(libgdxTestTexture), 0,1,2,1));
-        apps.add(new AppInfo(new BouncingBallsApp(), 2,1,1,1));
-        apps.add(new AppInfo(new BouncingBallsApp(), 0,2,3,1));
-        apps.add(new AppInfo(new TextureTestApp(libgdxTestTexture), 2,0,1,1));
-        calculateAppInfo();
+        try {
+            apps = AppLoader.loadAppsFromLayoutFile("layouts/testAppLayout.csv");
+            calculateAppInfo();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void calculateAppInfo() {

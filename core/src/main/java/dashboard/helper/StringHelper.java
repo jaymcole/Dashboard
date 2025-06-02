@@ -1,4 +1,4 @@
-package dashboard.apps.helper;
+package dashboard.helper;
 
 public class StringHelper {
 

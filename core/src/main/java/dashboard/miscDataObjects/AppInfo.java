@@ -1,6 +1,5 @@
 package dashboard.miscDataObjects;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
@@ -13,7 +12,7 @@ import dashboard.rendering.TextBox;
 import java.util.ArrayList;
 import java.util.List;
 
-import static dashboard.apps.helper.InputHelper.getMouseScreenPosition;
+import static dashboard.helper.InputHelper.getMouseScreenPosition;
 
 public class AppInfo {
     public static final int APP_PADDING = 3;
@@ -27,7 +26,7 @@ public class AppInfo {
     private BoundingBox onScreenBounds;
 
     public BoundingBox optionsButton;
-    private int optionsButtonSize = 20;
+    private int optionsButtonSize = 30;
 
     public boolean cursorOverApp = false;
     public boolean cursorOverOptions = false;
