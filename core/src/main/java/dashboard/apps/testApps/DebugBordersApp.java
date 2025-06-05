@@ -2,9 +2,14 @@ package dashboard.apps.testApps;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import dashboard.apps.BaseApp;
 import dashboard.miscDataObjects.RenderInfo;
 import dashboard.miscDataObjects.UpdateInfo;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class DebugBordersApp extends BaseApp {
 
@@ -13,6 +18,11 @@ public class DebugBordersApp extends BaseApp {
     public DebugBordersApp(Color debugColor) {
         super();
         this.debugColor = debugColor;
+    }
+
+    @Override
+    public void loadSettings(HashMap<String, String> savedSettings) {
+
     }
 
     @Override
@@ -33,6 +43,16 @@ public class DebugBordersApp extends BaseApp {
     @Override
     public void resize() {}
 
+    @Override
+    public HashMap<String, String> getCurrentAppSettings() {
+        return null;
+    }
+
+    @Override
+    public List<Actor> getSettingsUiActors() {
+        return new ArrayList<>();
+    }
+
     private void renderDebugBorder(RenderInfo renderInfo) {
         shapeRenderer.rect(1,1, appBounds.getWidth()-1, appBounds.getHeight()-1);
 
@@ -42,6 +62,4 @@ public class DebugBordersApp extends BaseApp {
         shapeRenderer.line(1,1,appBounds.getWidth(), appBounds.getHeight());
         shapeRenderer.line(1,appBounds.getHeight(), appBounds.getWidth(), 1);
     }
-
-
 }

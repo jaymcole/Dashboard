@@ -10,7 +10,8 @@ import dashboard.miscDataObjects.TextParameters;
 import dashboard.miscDataObjects.UpdateInfo;
 import dashboard.rendering.BoundingBox;
 import dashboard.rendering.TextBox;
-import org.w3c.dom.Text;
+
+import java.util.HashMap;
 
 public abstract class BaseApp implements IDashboardApp {
 
@@ -28,6 +29,8 @@ public abstract class BaseApp implements IDashboardApp {
         spriteBatch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
     }
+
+    public abstract void loadSettings(HashMap<String, String> savedSettings);
 
     @Override
     public abstract void update(UpdateInfo updateInfo);

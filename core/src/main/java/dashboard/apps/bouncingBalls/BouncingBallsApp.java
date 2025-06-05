@@ -1,13 +1,19 @@
 package dashboard.apps.bouncingBalls;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import dashboard.apps.BaseApp;
 import dashboard.miscDataObjects.RenderInfo;
 import dashboard.miscDataObjects.UpdateInfo;
 import dashboard.rendering.BoundingBox;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -88,10 +94,6 @@ public class BouncingBallsApp extends BaseApp {
         for(Ball ball : balls) {
             ball.update(updateInfo.delta);
         }
-        // Randomly break app
-//        if (random.nextInt(1000) < 3) {
-//            random = null;
-//        }
     }
 
     @Override
@@ -122,10 +124,57 @@ public class BouncingBallsApp extends BaseApp {
         }
     }
 
+    // test
+    private static final String BallCountSettingKey = "BallsCount";
+
+    @Override
+    public void loadSettings(HashMap<String, String> savedSettings) {
+        if (savedSettings.containsKey(BallCountSettingKey)) {
+            int newBallCount = Integer.parseInt(savedSettings.get(BallCountSettingKey));
+            adjustBallCount(newBallCount);
+        }
+    }
+
+    @Override
+    public HashMap<String, String> getCurrentAppSettings() {
+        HashMap<String, String> settings = new HashMap<>();
+        settings.put(BallCountSettingKey, String.valueOf(balls.size()));
+        return settings;
+    }
+
+    @Override
+    public List<Actor> getSettingsUiActors() {
+        List<Actor> settingsButtons = new ArrayList<>();
+        Skin skin = new Skin((Gdx.files.internal("skins/metalui/metal-ui.json")));
+
+        Slider ballsSlider = new Slider(0, 25, 1, false, skin);
+        ballsSlider.setValue(balls.size());
+        ballsSlider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent changeEvent, Actor actor) {
+                if (actor instanceof Slider actorSlider) {
+                    adjustBallCount((int)actorSlider.getValue());
+                    System.out.println("Setting balls to: " + (int)actorSlider.getValue());
+                }
+            }
+        });
+        settingsButtons.add(ballsSlider);
+        return settingsButtons;
+    }
+
+    public void adjustBallCount(int newCount) {
+        while (newCount < balls.size()) {
+            balls.remove(random.nextInt(balls.size()));
+        }
+        while (newCount > balls.size()) {
+            balls.add(constructBall());
+        }
+    }
+
     private Ball constructBall() {
         return new Ball(
-            random.nextInt((int)appBounds.getWidth()),
-            random.nextInt((int)appBounds.getHeight()),
+            10,
+            10,
             random.nextInt(30) + 5,
             random.nextInt(30) - 15,
             random.nextInt(MAX_BALL_SIZE - MINIMUM_BALL_SIZE) + MINIMUM_BALL_SIZE,

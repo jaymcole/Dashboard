@@ -8,11 +8,19 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import dashboard.helper.AppLoader;
+import dashboard.helper.FontHelper;
 import dashboard.miscDataObjects.*;
 import dashboard.rendering.BoundingBox;
 
@@ -32,19 +40,15 @@ public class Home implements Screen {
     private HashSet<AppInfo> brokenApps;
     private Matrix4 matrix = new Matrix4();
     private BitmapFont debugFont;
-
+    private AppInfo settingsOpened = null;
+    private Stage stage;
 
     @Override
     public void show() {
         brokenApps = new HashSet<>();
         shapeRenderer = new ShapeRenderer();
         spriteBatch = new SpriteBatch();
-
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Roboto-Regular.ttf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 12;
-        debugFont = generator.generateFont(parameter); // font size 12 pixels
-        generator.dispose(); // don't forget to dispose to avoid memory leaks!
+        debugFont = FontHelper.loadFont("fonts/Roboto-Regular.ttf", 12);
 
         apps = new ArrayList<>();
         try {
@@ -53,6 +57,33 @@ public class Home implements Screen {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void constructAppSettings(AppInfo info) {
+        stage = new Stage(new ScreenViewport());
+        Table root = new Table();
+        root.setFillParent(true);
+
+        for(Actor actor : info.app.getSettingsUiActors()) {
+            root.add(actor).expand();
+            root.row();
+        }
+
+        Skin skin = new Skin((Gdx.files.internal("skins/metalui/metal-ui.json")));
+        TextButton textButton = new TextButton("Close settings", skin);
+        textButton.setPosition(stage.getWidth() / 2, stage.getHeight() / 2, Align.center);
+        textButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent changeEvent, Actor actor) {
+                settingsOpened = null;
+                AppLoader.SaveAppSettings(info);
+            }
+        });
+        root.add(textButton);
+
+
+
+        stage.addActor(root);
     }
 
     private void calculateAppInfo() {
@@ -76,6 +107,7 @@ public class Home implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
         for(AppInfo info : apps) {
             if (!brokenApps.contains(info)) {
                 updateApp(info, delta);
@@ -84,8 +116,27 @@ public class Home implements Screen {
                 renderAppErrors(info);
             }
         }
+
         renderAppsToHomeScreen();
         renderOptionsButtonBoundingBoxes();
+
+        if (settingsOpened != null) {
+            renderStage();
+        }
+    }
+
+    private void renderStage() {
+        Gdx.input.setInputProcessor(stage);
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        matrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        shapeRenderer.setProjectionMatrix(matrix);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(new Color(0,0,0,0.9f));
+        shapeRenderer.rect(0,0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        shapeRenderer.end();
+        stage.act();
+        stage.draw();
     }
 
     private void updateApp(AppInfo info, float delta) {
@@ -95,6 +146,12 @@ public class Home implements Screen {
         try {
             info.update();
             info.app.update(updateInfo);
+
+
+            if (settingsOpened == null && Gdx.input.justTouched() && info.cursorOverOptions) {
+                constructAppSettings(info);
+                settingsOpened = info;
+            }
         } catch (Exception e) {
             String errorMessage = info.app.getAppName() + ": " + e.getMessage();
             info.registerErrorMessage(errorMessage);
@@ -175,6 +232,11 @@ public class Home implements Screen {
             if (info.cursorOverOptions) {
                 shapeRenderer.setColor(Color.GREEN);
             }
+
+            if (info == settingsOpened) {
+                shapeRenderer.setColor(Color.MAGENTA);
+            }
+
             info.optionsButton.render(shapeRenderer);
         }
 
@@ -210,6 +272,9 @@ public class Home implements Screen {
         // In that case, we don't resize anything, and wait for the window to be a normal size before updating.
         if(width <= 0 || height <= 0) return;
 
+        if (stage != null) {
+            stage.getViewport().update(width, height, false);
+        }
         // Resize your screen here. The parameters represent the new window size.
         calculateAppInfo();
     }

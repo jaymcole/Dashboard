@@ -1,4 +1,4 @@
-BB_A,C__A,BB_A
-TT_A,C__A,BB_A
-BB_A,TT_A,BB_A
-C__A,C__A,C__A
+BB_A 1,C__A 1,BB_A 2
+TT_A 1,C__A 1,BB_A 2
+BB_A 3,TT_A 2,BB_A 2
+C__A 1,C__A 1,C__A 1

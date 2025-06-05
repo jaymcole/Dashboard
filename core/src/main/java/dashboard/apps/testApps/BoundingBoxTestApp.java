@@ -2,18 +2,29 @@ package dashboard.apps.testApps;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import dashboard.apps.BaseApp;
 import dashboard.miscDataObjects.RenderInfo;
 import dashboard.miscDataObjects.UpdateInfo;
 import dashboard.rendering.BoundingBox;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class BoundingBoxTestApp extends BaseApp {
 
     private List<BoundingBox> testBoundingBoxes;
     private List<Color> boxColors;
+
+    public BoundingBoxTestApp() {
+        super();
+    }
+
+    @Override
+    public void loadSettings(HashMap<String, String> savedSettings) {
+
+    }
 
     @Override
     public void update(UpdateInfo updateInfo) {
@@ -59,5 +70,15 @@ public class BoundingBoxTestApp extends BaseApp {
         boxColors.add(Color.RED);
         testBoundingBoxes.add(new BoundingBox(appBounds, 0, 90, 100, 100));
         boxColors.add(Color.YELLOW);
+    }
+
+    @Override
+    public HashMap<String, String> getCurrentAppSettings() {
+        return null;
+    }
+
+    @Override
+    public List<Actor> getSettingsUiActors() {
+        return List.of();
     }
 }

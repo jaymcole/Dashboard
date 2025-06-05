@@ -2,6 +2,7 @@ package dashboard.apps.clockApp;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import dashboard.apps.BaseApp;
 import dashboard.helper.StringHelper;
 import dashboard.miscDataObjects.RenderInfo;
@@ -10,9 +11,20 @@ import dashboard.rendering.BoundingBox;
 import dashboard.rendering.TextBox;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
 
 public class ClockApp extends BaseApp {
     private TextBox clockBox;
+
+    public ClockApp() {
+        super();
+    }
+
+    @Override
+    public void loadSettings(HashMap<String, String> savedSettings) {
+
+    }
 
     @Override
     public void update(UpdateInfo updateInfo) {
@@ -43,5 +55,15 @@ public class ClockApp extends BaseApp {
     @Override
     public void resize() {
         clockBox = new TextBox("fonts/Roboto-Regular.ttf", new BoundingBox(appBounds, 5, 5,95, 95), "00:00:00 PM", textParameters);
+    }
+
+    @Override
+    public HashMap<String, String> getCurrentAppSettings() {
+        return null;
+    }
+
+    @Override
+    public List<Actor> getSettingsUiActors() {
+        return List.of();
     }
 }

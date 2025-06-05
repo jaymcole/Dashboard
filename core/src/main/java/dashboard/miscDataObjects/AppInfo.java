@@ -17,6 +17,11 @@ import static dashboard.helper.InputHelper.getMouseScreenPosition;
 public class AppInfo {
     public static final int APP_PADDING = 3;
 
+    // Used to separate save files for the same app
+    // Example: you have two clock apps on your dashboard with different timezones. We'll want separate save files for the two different instances.
+    // prefix is set in layout-file "<app code> <save suffix>"
+    private final String optionalSaveSuffix;
+
     public final BaseApp app;
     public int xCell; // top-most row
     public int xCellCount; // in rows
@@ -34,7 +39,8 @@ public class AppInfo {
     private TextBox errorMessageTextBox;
     private final List<String> errorMessages;
 
-    public AppInfo (BaseApp app, int xCell, int yCell, int xCellCount, int yCellCount) {
+    public AppInfo (BaseApp app, int xCell, int yCell, int xCellCount, int yCellCount, String saveSuffix) {
+        this.optionalSaveSuffix = saveSuffix;
         errorMessages = new ArrayList<>();
         this.app = app;
         this.xCell = xCell;
@@ -95,5 +101,9 @@ public class AppInfo {
 
     public Coordinate2D getScreenCoordinates() {
         return new Coordinate2D(onScreenBounds.getX(), onScreenBounds.getY());
+    }
+
+    public String getSaveFileName() {
+        return app.getAppName() + optionalSaveSuffix + ".save";
     }
 }
