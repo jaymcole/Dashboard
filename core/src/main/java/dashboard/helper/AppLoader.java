@@ -40,6 +40,12 @@ public class AppLoader {
         try {
             FileWriter writer = new FileWriter(settingsFile.file());
             HashMap<String, String> settings =  info.app.getCurrentAppSettings();
+
+            if (settings == null) {
+                System.err.println(info.app.getAppName() + " failed to save settings. getCurrentAppSettings returned null map.");
+                return;
+            }
+
             for(Map.Entry<String, String> entry : settings.entrySet()) {
                 writer.append(entry.getKey() + SettingsKeyValueDelimiter + entry.getValue());
                 writer.append("\n");
@@ -57,14 +63,14 @@ public class AppLoader {
         for(int row = 0; row < layout.size(); row++) {
             for(int col = 0; col < layout.get(row).length; col++) {
                 if (layout.get(row)[col].compareTo(EmptySpace) != 0 && layout.get(row)[col].compareTo(SeenSpace) != 0) {
-                    exploreAndInstantiateApp(apps, layout, row, col);
+                    exploreLayoutAndInstantiateApp(apps, layout, row, col);
                 }
             }
         }
         return apps;
     }
 
-    private static void exploreAndInstantiateApp(List<AppInfo> apps, List<String[]> layout, int row, int col) {
+    private static void exploreLayoutAndInstantiateApp(List<AppInfo> apps, List<String[]> layout, int row, int col) {
         String entry = layout.get(row)[col];
         int endColumn = col;
         while (endColumn <= layout.get(row).length-2 && layout.get(row)[endColumn+1].compareTo(entry) == 0) {

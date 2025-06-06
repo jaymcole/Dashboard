@@ -73,7 +73,10 @@ public class BouncingBallsApp extends BaseApp {
         Color.RED,
         Color.YELLOW,
         Color.BLUE,
-        Color.GREEN
+        Color.GREEN,
+        Color.CHARTREUSE,
+        Color.MAGENTA,
+        Color.ROYAL
     };
 
     private final int MINIMUM_BALL_SIZE = 3; // in pixel radius
