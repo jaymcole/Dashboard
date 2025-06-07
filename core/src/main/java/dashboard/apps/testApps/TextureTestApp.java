@@ -15,10 +15,12 @@ import java.util.List;
 public class TextureTestApp extends BaseApp {
 
     private final Texture texture;
+    private BoundingBox squareBounds;
 
     public TextureTestApp(BoundingBox appBounds) {
         super(appBounds);
         this.texture = new Texture(Gdx.files.internal("libgdx128.png"));
+        squareBounds = appBounds.getLargestSquare();
     }
 
     @Override
@@ -35,13 +37,14 @@ public class TextureTestApp extends BaseApp {
         matrix.setToOrtho2D(0, 0, appBounds.getWidth(), appBounds.getHeight());
         spriteBatch.setProjectionMatrix(matrix);
         spriteBatch.begin();
-        spriteBatch.draw(texture, 0,0, appBounds.getWidth(), appBounds.getHeight());
+
+        spriteBatch.draw(texture, squareBounds.getX(),squareBounds.getY(), squareBounds.getWidth(), squareBounds.getHeight());
         spriteBatch.end();
     }
 
     @Override
     protected void resizeApp() {
-
+        squareBounds = appBounds.getLargestSquare();
     }
 
     @Override

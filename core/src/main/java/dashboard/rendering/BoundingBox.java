@@ -57,4 +57,9 @@ public class BoundingBox {
     public float getHeight() {
         return height;
     }
+
+    public BoundingBox getLargestSquare() {
+        float size = Math.min(width, height);
+        return new BoundingBox(x + (width - size) / 2, y + (height - size) / 2, size, size);
+    }
 }
