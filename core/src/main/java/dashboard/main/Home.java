@@ -4,11 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -62,7 +60,7 @@ public class Home implements Screen {
     private void constructAppSettings(AppInfo info) {
         stage = new Stage(new ScreenViewport());
         Table root = new Table();
-        root.setFillParent(true);
+        root.setPosition(Gdx.graphics.getWidth() / 2.0f, Gdx.graphics.getHeight() / 2.0f);
 
         for(Actor actor : info.app.getSettingsUiActors()) {
             root.add(actor).expand();
@@ -70,7 +68,7 @@ public class Home implements Screen {
         }
 
         Skin skin = new Skin((Gdx.files.internal("skins/metalui/metal-ui.json")));
-        TextButton textButton = new TextButton("Close settings", skin);
+        TextButton textButton = new TextButton("Close Settings", skin);
         textButton.setPosition(stage.getWidth() / 2, stage.getHeight() / 2, Align.center);
         textButton.addListener(new ChangeListener() {
             @Override
@@ -80,16 +78,12 @@ public class Home implements Screen {
             }
         });
         root.add(textButton);
-
-
-
         stage.addActor(root);
     }
 
     private void calculateAppInfo() {
-        Tuple<Integer, Integer> horizontalVerticalCellCounts = findMaxNumberOfRowsAndColumnsNeeded(apps);
-        int cellWidth = Gdx.graphics.getWidth() / horizontalVerticalCellCounts.left;
-        int cellHeight = Gdx.graphics.getHeight() / horizontalVerticalCellCounts.right;
+        int cellWidth = Gdx.graphics.getWidth() / AppLoader.Total_Rows;
+        int cellHeight = Gdx.graphics.getHeight() / AppLoader.Total_Columns;
 
         for(AppInfo info : apps) {
             info.resize(new BoundingBox(
@@ -98,8 +92,6 @@ public class Home implements Screen {
                 info.xCellCount * cellWidth,
                 info.yCellCount * cellHeight
             ));
-
-            info.frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, (int)info.app.getBounds().getWidth(), (int)info.app.getBounds().getHeight(), false);
         }
     }
 
@@ -112,17 +104,21 @@ public class Home implements Screen {
             if (!brokenApps.contains(info)) {
                 updateApp(info, delta);
                 renderAppToFrameBuffer(info);
-            } else {
-                renderAppErrors(info);
             }
         }
 
         renderAppsToHomeScreen();
         renderOptionsButtonBoundingBoxes();
 
+        for(AppInfo info : apps) {
+            if (brokenApps.contains(info)) {
+                renderAppErrors(info);
+            }
+        }
         if (settingsOpened != null) {
             renderStage();
         }
+
     }
 
     private void renderStage() {
@@ -146,7 +142,6 @@ public class Home implements Screen {
         try {
             info.update();
             info.app.update(updateInfo);
-
 
             if (settingsOpened == null && Gdx.input.justTouched() && info.cursorOverOptions) {
                 constructAppSettings(info);
@@ -179,7 +174,7 @@ public class Home implements Screen {
     }
 
     private void renderAppErrors(AppInfo info) {
-        matrix.setToOrtho2D(0, 0, info.app.getBounds().getWidth(), info.app.getBounds().getHeight());
+        matrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         spriteBatch.setProjectionMatrix(matrix);
         spriteBatch.setColor(Color.WHITE);
         spriteBatch.begin();
@@ -188,8 +183,10 @@ public class Home implements Screen {
 
         shapeRenderer.setProjectionMatrix(matrix);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(Color.WHITE);
-        info.app.getBounds().render(shapeRenderer);
+        shapeRenderer.setColor(Color.YELLOW);
+        info.getBounds().render(shapeRenderer);
+        shapeRenderer.line(0,0, info.getBounds().getX(), info.getBounds().getY());
+
         shapeRenderer.end();
     }
 
@@ -215,7 +212,8 @@ public class Home implements Screen {
          spriteBatch.end();
      }
 
-    private void renderOptionsButtonBoundingBoxes() {
+    private void renderOptionsButtonBoundingBoxes()
+    {
         matrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         shapeRenderer.setProjectionMatrix(matrix);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
@@ -241,29 +239,6 @@ public class Home implements Screen {
         }
 
         shapeRenderer.end();
-    }
-
-    private void renderDebugCellBorders() {
-        spriteBatch.begin();
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(Color.RED);
-
-        // render vertical grid lines
-        Tuple<Integer, Integer> horizontalVerticalCellCounts = findMaxNumberOfRowsAndColumnsNeeded(apps);
-        for(int i = 0; i < horizontalVerticalCellCounts.left; i ++) {
-            int xPos = i * (Gdx.graphics.getWidth() / horizontalVerticalCellCounts.left);
-            shapeRenderer.line(xPos, 0, xPos, Gdx.graphics.getHeight());
-
-        }
-
-        // render horizontal grid lines
-        for(int i = 0; i < horizontalVerticalCellCounts.right; i ++) {
-            int yPos = i * (Gdx.graphics.getWidth() / horizontalVerticalCellCounts.left);
-            shapeRenderer.line(0, yPos, Gdx.graphics.getWidth(), yPos);
-        }
-
-        shapeRenderer.end();
-        spriteBatch.end();
     }
 
     @Override
@@ -297,21 +272,5 @@ public class Home implements Screen {
     @Override
     public void dispose() {
         // Destroy screen's assets here.
-    }
-
-    private Tuple<Integer, Integer> findMaxNumberOfRowsAndColumnsNeeded(List<AppInfo> apps) {
-        int maxRows = 0;
-        int maxCols = 0;
-        for (AppInfo info : apps) {
-            if (info.xCell + info.xCellCount > maxRows) {
-                maxRows = info.xCell + info.xCellCount;
-            }
-
-            if (info.yCell + info.yCellCount > maxCols) {
-                maxCols = info.yCell + info.yCellCount;
-            }
-        }
-//        return new Tuple<>(2,2);
-        return new Tuple<>(maxRows, maxCols);
     }
 }

@@ -1,6 +1,7 @@
 package dashboard.miscDataObjects;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import dashboard.apps.BaseApp;
@@ -59,14 +60,16 @@ public class AppInfo {
 
     public void resize(BoundingBox newBounds) {
         onScreenBounds = newBounds;
-        BoundingBox appBounds = new BoundingBox(
+
+
+        BoundingBox newAppBounds = new BoundingBox(
             APP_PADDING,
             APP_PADDING,
             newBounds.getWidth() - (APP_PADDING * 2.0f),
             newBounds.getHeight() - (APP_PADDING * 2.0f)
         );
-        app.resize(appBounds);
-
+        app.resize(newAppBounds);
+        frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, (int)app.getBounds().getWidth(), (int)app.getBounds().getHeight(), false);
         optionsButton = new BoundingBox(newBounds.getX() + onScreenBounds.getWidth() - optionsButtonSize, newBounds.getY() + onScreenBounds.getHeight() - optionsButtonSize, optionsButtonSize, optionsButtonSize);
         resizeErrorMessage();
     }
@@ -76,7 +79,7 @@ public class AppInfo {
             TextParameters params = new TextParameters();
             params.horizontalAlignment = TextHorizontalAlignment.CENTER;
             params.verticalAlignment = TextVerticalAlignment.CENTER;
-            errorMessageTextBox = new TextBox("fonts/Roboto-Regular.ttf", app.getBounds(), String.join("\n", errorMessages), params);
+            errorMessageTextBox = new TextBox("fonts/Roboto-Regular.ttf", getBounds(), String.join("\n", errorMessages), params);
         }
     }
 

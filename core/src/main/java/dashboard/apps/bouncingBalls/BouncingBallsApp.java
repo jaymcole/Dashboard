@@ -94,6 +94,9 @@ public class BouncingBallsApp extends BaseApp {
 
     @Override
     public void update(UpdateInfo updateInfo) {
+//        if (random.nextInt(1000) < 10) {
+//            random = null;
+//        }
         for(Ball ball : balls) {
             ball.update(updateInfo.delta);
         }
@@ -115,7 +118,7 @@ public class BouncingBallsApp extends BaseApp {
     }
 
     @Override
-    public void resize(BoundingBox newBounds) {
+    public void resizeApp() {
         if (balls != null) {
             for (Ball ball : balls) {
                 ball.bounds = appBounds;
@@ -135,7 +138,7 @@ public class BouncingBallsApp extends BaseApp {
     }
 
     @Override
-    public HashMap<String, String> getCurrentAppSettings() {
+    public HashMap<String, String> saveSettings() {
         HashMap<String, String> settings = new HashMap<>();
         settings.put(BallCountSettingKey, String.valueOf(balls.size()));
         return settings;

@@ -15,6 +15,6 @@ public interface IDashboardApp {
     public void resize(BoundingBox newBounds);
     public String getAppName();
 
-    public HashMap<String, String> getCurrentAppSettings();
+    public HashMap<String, String> saveSettings();
     public List<Actor> getSettingsUiActors();
 }

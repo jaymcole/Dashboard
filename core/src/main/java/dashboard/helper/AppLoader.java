@@ -32,8 +32,8 @@ public class AppLoader {
     private static final String SettingsKeyValueDelimiter = "greatbarrierreef";
     private static final String AppSettingsFolder = "DashboardApp/appSettings/";
 
-    private static int Total_Rows = 1;
-    private static int Total_Columns = 1;
+    public static int Total_Rows = 1;
+    public static int Total_Columns = 1;
 
     public static void SaveAppSettings(AppInfo info) {
         FileHandle settingsFile = Gdx.files.external(AppSettingsFolder + info.getSaveFileName());
@@ -43,7 +43,7 @@ public class AppLoader {
         createSettingsFile(settingsFile, info);
         try {
             FileWriter writer = new FileWriter(settingsFile.file());
-            HashMap<String, String> settings =  info.app.getCurrentAppSettings();
+            HashMap<String, String> settings =  info.app.saveSettings();
 
             if (settings == null) {
                 System.err.println(info.app.getAppName() + " failed to save settings. getCurrentAppSettings returned null map.");
@@ -131,12 +131,13 @@ public class AppLoader {
         return info;
     }
 
-    private static BoundingBox calculateAppBoundingBox(int horizontalCellCount, int verticalCellCount) {
+    public static BoundingBox calculateAppBoundingBox(int horizontalCellCount, int verticalCellCount) {
         int cellWidth = Gdx.graphics.getWidth() / Total_Columns;
         int cellHeight = Gdx.graphics.getHeight() / Total_Rows;
         int boundsWidth = horizontalCellCount * cellWidth;
         int boundsHeight = verticalCellCount * cellHeight;
-        return new BoundingBox(0, 0, boundsWidth, boundsHeight);
+        BoundingBox bounds = new BoundingBox(0, 0, boundsWidth, boundsHeight);
+        return bounds;
     }
 
     private static void createSettingsFile(FileHandle settingsFile, AppInfo info) {

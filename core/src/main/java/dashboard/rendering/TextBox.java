@@ -66,7 +66,7 @@ public class TextBox {
     }
 
     private void findCorrectFontSize() {
-        int tooSmall = 5;
+        int tooSmall = 8;
         int tooLarge = 500;
         int currentFontSize = (tooLarge + tooSmall) / 2;
         while (tooLarge - tooSmall > 1) {
@@ -78,7 +78,6 @@ public class TextBox {
             } else if (layout.height <= bounds.getWidth() || layout.height <= bounds.getHeight()) {
                 tooSmall = currentFontSize;
             }
-            System.out.println("Text: " + text + " layout.width: " + layout.width + " bounds.getWidth: " + bounds.getWidth());
         }
 
         if (layout.width > bounds.getWidth()) {

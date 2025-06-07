@@ -31,7 +31,12 @@ public class WeatherApp extends BaseApp {
     }
 
     @Override
-    public HashMap<String, String> getCurrentAppSettings() {
+    protected void resizeApp() {
+
+    }
+
+    @Override
+    public HashMap<String, String> saveSettings() {
         return null;
     }
 

@@ -44,8 +44,7 @@ public class BoundingBoxTestApp extends BaseApp {
     }
 
     @Override
-    public void resize(BoundingBox newBounds) {
-        this.appBounds = newBounds;
+    public void resizeApp() {
         testBoundingBoxes = new ArrayList<>();
         boxColors = new ArrayList<>();
 
@@ -74,7 +73,7 @@ public class BoundingBoxTestApp extends BaseApp {
     }
 
     @Override
-    public HashMap<String, String> getCurrentAppSettings() {
+    public HashMap<String, String> saveSettings() {
         return null;
     }
 

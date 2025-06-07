@@ -55,7 +55,10 @@ public abstract class BaseApp implements IDashboardApp {
     public void resize(BoundingBox newBounds) {
         this.appBounds = newBounds;
         constructAppNameTextBox();
+        resizeApp();
     }
+
+    protected abstract void resizeApp();
 
     @Override
     public String getAppName() {
