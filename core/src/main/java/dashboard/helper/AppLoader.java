@@ -64,8 +64,8 @@ public class AppLoader {
         List<AppInfo> apps = new ArrayList<>();
         List<String[]> layout = readLayoutFile(Gdx.files.internal(appLayoutCSVPath));
 
-        Total_Rows = layout.size();
-        Total_Columns = layout.get(0).length;
+        Total_Rows = layout.get(0).length;
+        Total_Columns = layout.size();
 
         for(int row = 0; row < layout.size(); row++) {
             for(int col = 0; col < layout.get(row).length; col++) {
