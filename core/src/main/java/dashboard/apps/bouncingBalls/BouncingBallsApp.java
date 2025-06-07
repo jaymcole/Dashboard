@@ -22,6 +22,9 @@ public class BouncingBallsApp extends BaseApp {
         public float x, y, directionX, directionY, size;
         public Color color;
         private BoundingBox bounds;
+        private float timeSpentOnGround = 0;
+
+        private final float timeNeededToBounce;
 
         public Ball(float x, float y, float directionX, float directionY, float size, BoundingBox bounds, Color color) {
             this.x = x;
@@ -31,13 +34,14 @@ public class BouncingBallsApp extends BaseApp {
             this.size = size;
             this.bounds = bounds;
             this.color = color;
+
+            timeNeededToBounce = random.nextInt(5) + 6;
         }
 
         public void update (float delta, float gravity) {
             x += directionX * delta;
             y += directionY * delta;
             directionY -= gravity;
-
 
             if (x < bounds.getX() + size) {
                 directionX *= -1;
@@ -48,7 +52,6 @@ public class BouncingBallsApp extends BaseApp {
                 directionX *= -1;
                 x = bounds.getX() + bounds.getWidth() - size;
                 directionX *= 1.2f;
-
             }
 
             if (directionX > 1000) {
@@ -57,8 +60,19 @@ public class BouncingBallsApp extends BaseApp {
 
             if (y < bounds.getY() + size) {
                 directionY *= -1;
-                directionY *= 0.9f;
+                directionY *= 0.7f;
                 y = bounds.getY() + 1 + size;
+            }
+
+            if (y < 50) {
+                timeSpentOnGround += delta;
+            } else {
+                timeSpentOnGround = 0;
+            }
+
+            if (timeSpentOnGround > timeNeededToBounce) {
+                timeSpentOnGround = 0;
+                directionY -= random.nextInt(500) + bounds.getHeight() * 2;
             }
         }
 
