@@ -4,8 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Slider;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import dashboard.apps.BaseApp;
 import dashboard.miscDataObjects.RenderInfo;
@@ -34,10 +33,10 @@ public class BouncingBallsApp extends BaseApp {
             this.color = color;
         }
 
-        public void update (float delta) {
+        public void update (float delta, float gravity) {
             x += directionX * delta;
             y += directionY * delta;
-            directionY -= 9.8f;
+            directionY -= gravity;
 
 
             if (x < bounds.getX() + size) {
@@ -58,7 +57,7 @@ public class BouncingBallsApp extends BaseApp {
 
             if (y < bounds.getY() + size) {
                 directionY *= -1;
-                directionY *= 0.95f;
+                directionY *= 0.9f;
                 y = bounds.getY() + 1 + size;
             }
         }
@@ -86,6 +85,8 @@ public class BouncingBallsApp extends BaseApp {
     private List<Ball> balls;
 
 
+    private float gravity = 9.8f;
+
     public BouncingBallsApp(BoundingBox appBounds) {
         super(appBounds);
         random = new Random();
@@ -98,7 +99,7 @@ public class BouncingBallsApp extends BaseApp {
 //            random = null;
 //        }
         for(Ball ball : balls) {
-            ball.update(updateInfo.delta);
+            ball.update(updateInfo.delta, gravity);
         }
     }
 
@@ -149,18 +150,56 @@ public class BouncingBallsApp extends BaseApp {
         List<Actor> settingsButtons = new ArrayList<>();
         Skin skin = new Skin((Gdx.files.internal("skins/metalui/metal-ui.json")));
 
-        Slider ballsSlider = new Slider(0, 25, 1, false, skin);
+        Table ballCountTable = new Table();
+        TextButton ballCountLabel = new TextButton("Balls: " + balls.size(), skin);
+
+        Slider ballsSlider = new Slider(0, 100, 1, false, skin);
         ballsSlider.setValue(balls.size());
         ballsSlider.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent changeEvent, Actor actor) {
                 if (actor instanceof Slider actorSlider) {
                     adjustBallCount((int)actorSlider.getValue());
+                    ballCountLabel.setText("Balls: " + balls.size());
                     System.out.println("Setting balls to: " + (int)actorSlider.getValue());
                 }
             }
         });
-        settingsButtons.add(ballsSlider);
+        ballCountTable.add(ballCountLabel);
+        ballCountTable.add(ballsSlider);
+        settingsButtons.add(ballCountTable);
+
+
+        Table gravityTable = new Table();
+        TextButton sliderLabel = new TextButton("Gravity: " + gravity, skin);
+        sliderLabel.setDisabled(true);
+
+        Slider gravitySlider = new Slider(-5, 20, 0.01f, false, skin);
+        gravitySlider.setValue(gravity);
+        gravitySlider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent changeEvent, Actor actor) {
+                if (actor instanceof Slider actorSlider) {
+                    gravity = actorSlider.getValue();
+                    sliderLabel.setText(String.format("Gravity %.2f", gravity));
+                }
+            }
+        });
+        TextButton gravityResetButton = new TextButton("9.8", skin);
+        gravityResetButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent changeEvent, Actor actor) {
+                gravity = 9.8f;
+                sliderLabel.setText(String.format("Gravity %.2f", gravity));
+                gravitySlider.setValue(gravity);
+            }
+        });
+
+        gravityTable.add(sliderLabel);
+        gravityTable.add(gravitySlider);
+        gravityTable.add(gravityResetButton);
+
+        settingsButtons.add(gravityTable);
         return settingsButtons;
     }
 
