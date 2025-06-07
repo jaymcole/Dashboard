@@ -45,10 +45,10 @@ public abstract class BaseApp implements IDashboardApp {
     public abstract void render(RenderInfo renderInfo);
 
     public void renderDebugForeground(RenderInfo renderInfo) {
-        spriteBatch.setProjectionMatrix(matrix);
-        spriteBatch.begin();
-        renderAppName(renderInfo);
-        spriteBatch.end();
+//        spriteBatch.setProjectionMatrix(matrix);
+//        spriteBatch.begin();
+//        renderAppName(renderInfo);
+//        spriteBatch.end();
     }
 
     @Override

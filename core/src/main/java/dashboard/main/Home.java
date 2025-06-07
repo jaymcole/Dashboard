@@ -116,12 +116,12 @@ public class Home implements Screen {
             }
         }
         if (settingsOpened != null) {
-            renderStage();
+            renderSettings();
         }
 
     }
 
-    private void renderStage() {
+    private void renderSettings() {
         Gdx.input.setInputProcessor(stage);
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -220,11 +220,11 @@ public class Home implements Screen {
         shapeRenderer.setColor(Color.WHITE);
 
         for(AppInfo info : apps) {
-            shapeRenderer.setColor(Color.BLUE);
-            if (info.cursorOverApp) {
-                shapeRenderer.setColor(Color.GREEN);
-            }
-            info.getBounds().render(shapeRenderer);
+//            shapeRenderer.setColor(Color.BLUE);
+//            if (info.cursorOverApp) {
+//                shapeRenderer.setColor(Color.GREEN);
+//            }
+//            info.getBounds().render(shapeRenderer);
 
             shapeRenderer.setColor(Color.BLUE);
             if (info.cursorOverOptions) {
