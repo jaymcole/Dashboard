@@ -9,6 +9,7 @@ import dashboard.apps.testApps.BoundingBoxTestApp;
 import dashboard.apps.testApps.DebugBordersApp;
 import dashboard.apps.testApps.TextureTestApp;
 import dashboard.miscDataObjects.AppInfo;
+import dashboard.rendering.BoundingBox;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -30,6 +31,9 @@ public class AppLoader {
 
     private static final String SettingsKeyValueDelimiter = "greatbarrierreef";
     private static final String AppSettingsFolder = "DashboardApp/appSettings/";
+
+    private static int Total_Rows = 1;
+    private static int Total_Columns = 1;
 
     public static void SaveAppSettings(AppInfo info) {
         FileHandle settingsFile = Gdx.files.external(AppSettingsFolder + info.getSaveFileName());
@@ -59,6 +63,9 @@ public class AppLoader {
     public static List<AppInfo> loadAppsFromLayoutFile(String appLayoutCSVPath) throws IOException {
         List<AppInfo> apps = new ArrayList<>();
         List<String[]> layout = readLayoutFile(Gdx.files.internal(appLayoutCSVPath));
+
+        Total_Rows = layout.size();
+        Total_Columns = layout.get(0).length;
 
         for(int row = 0; row < layout.size(); row++) {
             for(int col = 0; col < layout.get(row).length; col++) {
@@ -104,22 +111,32 @@ public class AppLoader {
         apps.add(instantiateApp(shorthand, optionalSaveSuffix, Math.abs((layout.size()-1) - row), col, endColumn, endRow));
     }
 
-    private static AppInfo instantiateApp(String shorthand, String optionalSaveSuffix, int row, int col, int width, int height) {
+    private static AppInfo instantiateApp(String shorthand, String optionalSaveSuffix, int row, int col, int horizontalCellCount, int verticalCellCount) {
+        BoundingBox appBounds = calculateAppBoundingBox(horizontalCellCount, verticalCellCount);
+
         AppInfo info = switch (shorthand) {
             case BouncingBallAppShorthand ->
-                new AppInfo(new BouncingBallsApp(), col, row, width, height, optionalSaveSuffix);
-            case ClockAppShorthand -> new AppInfo(new ClockApp(), col, row, width, height, optionalSaveSuffix);
+                new AppInfo(new BouncingBallsApp(appBounds), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
+            case ClockAppShorthand -> new AppInfo(new ClockApp(appBounds), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
             case TextureTextAppShorthand ->
-                new AppInfo(new TextureTestApp(), col, row, width, height, optionalSaveSuffix);
+                new AppInfo(new TextureTestApp(appBounds), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
             case BoundingBoxTestAppShorthand ->
-                new AppInfo(new BoundingBoxTestApp(), col, row, width, height, optionalSaveSuffix);
-            default -> new AppInfo(new DebugBordersApp(Color.BLUE), col, row, width, height, optionalSaveSuffix);
+                new AppInfo(new BoundingBoxTestApp(appBounds), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
+            default -> new AppInfo(new DebugBordersApp(appBounds, Color.BLUE), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
         };
 
         FileHandle settingsFile = Gdx.files.external(AppSettingsFolder + info.getSaveFileName());
         createSettingsFile(settingsFile, info);
         info.app.loadSettings(readSettingsFile(settingsFile));
         return info;
+    }
+
+    private static BoundingBox calculateAppBoundingBox(int horizontalCellCount, int verticalCellCount) {
+        int cellWidth = Gdx.graphics.getWidth() / Total_Columns;
+        int cellHeight = Gdx.graphics.getHeight() / Total_Rows;
+        int boundsWidth = horizontalCellCount * cellWidth;
+        int boundsHeight = verticalCellCount * cellHeight;
+        return new BoundingBox(0, 0, boundsWidth, boundsHeight);
     }
 
     private static void createSettingsFile(FileHandle settingsFile, AppInfo info) {

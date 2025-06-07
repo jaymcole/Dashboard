@@ -86,8 +86,8 @@ public class BouncingBallsApp extends BaseApp {
     private List<Ball> balls;
 
 
-    public BouncingBallsApp() {
-        super();
+    public BouncingBallsApp(BoundingBox appBounds) {
+        super(appBounds);
         random = new Random();
         balls = new ArrayList<>();
     }
@@ -115,12 +115,8 @@ public class BouncingBallsApp extends BaseApp {
     }
 
     @Override
-    public void resize() {
-        if (balls.isEmpty()) {
-            for(int i = 0; i < 15; i++ ) {
-                balls.add(constructBall());
-            }
-        } else {
+    public void resize(BoundingBox newBounds) {
+        if (balls != null) {
             for (Ball ball : balls) {
                 ball.bounds = appBounds;
             }
@@ -176,8 +172,8 @@ public class BouncingBallsApp extends BaseApp {
 
     private Ball constructBall() {
         return new Ball(
-            10,
-            10,
+            random.nextInt((int)appBounds.getWidth()),
+            random.nextInt((int)appBounds.getHeight()),
             random.nextInt(30) + 5,
             random.nextInt(30) - 15,
             random.nextInt(MAX_BALL_SIZE - MINIMUM_BALL_SIZE) + MINIMUM_BALL_SIZE,

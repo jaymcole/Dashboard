@@ -17,8 +17,8 @@ public class BoundingBoxTestApp extends BaseApp {
     private List<BoundingBox> testBoundingBoxes;
     private List<Color> boxColors;
 
-    public BoundingBoxTestApp() {
-        super();
+    public BoundingBoxTestApp(BoundingBox appBounds) {
+        super(appBounds);
     }
 
     @Override
@@ -44,7 +44,8 @@ public class BoundingBoxTestApp extends BaseApp {
     }
 
     @Override
-    public void resize() {
+    public void resize(BoundingBox newBounds) {
+        this.appBounds = newBounds;
         testBoundingBoxes = new ArrayList<>();
         boxColors = new ArrayList<>();
 

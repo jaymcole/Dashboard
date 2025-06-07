@@ -65,7 +65,7 @@ public class AppInfo {
             newBounds.getWidth() - (APP_PADDING * 2.0f),
             newBounds.getHeight() - (APP_PADDING * 2.0f)
         );
-        app.setNewBounds(appBounds);
+        app.resize(appBounds);
 
         optionsButton = new BoundingBox(newBounds.getX() + onScreenBounds.getWidth() - optionsButtonSize, newBounds.getY() + onScreenBounds.getHeight() - optionsButtonSize, optionsButtonSize, optionsButtonSize);
         resizeErrorMessage();

@@ -17,8 +17,8 @@ import java.util.List;
 public class ClockApp extends BaseApp {
     private TextBox clockBox;
 
-    public ClockApp() {
-        super();
+    public ClockApp(BoundingBox appBounds) {
+        super(appBounds);
     }
 
     @Override
@@ -53,7 +53,8 @@ public class ClockApp extends BaseApp {
     }
 
     @Override
-    public void resize() {
+    public void resize(BoundingBox newBounds) {
+        this.appBounds = newBounds;
         clockBox = new TextBox("fonts/Roboto-Regular.ttf", new BoundingBox(appBounds, 5, 5,95, 95), "00:00:00 PM", textParameters);
     }
 

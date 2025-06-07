@@ -11,8 +11,8 @@ import java.util.List;
 
 public class WeatherApp extends BaseApp {
 
-    public WeatherApp() {
-        super();
+    public WeatherApp(BoundingBox appBounds) {
+        super(appBounds);
     }
 
     @Override
@@ -27,11 +27,6 @@ public class WeatherApp extends BaseApp {
 
     @Override
     public void render(RenderInfo renderInfo) {
-
-    }
-
-    @Override
-    public void resize() {
 
     }
 

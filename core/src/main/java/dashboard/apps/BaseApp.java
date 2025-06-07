@@ -22,12 +22,14 @@ public abstract class BaseApp implements IDashboardApp {
     private TextBox appNameTextBox;
     protected TextParameters textParameters;
 
-    public BaseApp() {
+    public BaseApp(BoundingBox appBounds) {
         textParameters = new TextParameters();
         textParameters.horizontalAlignment = TextHorizontalAlignment.CENTER;
         textParameters.verticalAlignment = TextVerticalAlignment.CENTER;
         spriteBatch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
+        this.appBounds = appBounds;
+        resize(appBounds);
     }
 
     public abstract void loadSettings(HashMap<String, String> savedSettings);
@@ -49,18 +51,11 @@ public abstract class BaseApp implements IDashboardApp {
         spriteBatch.end();
     }
 
-    public void setNewBounds(BoundingBox newBounds) {
-        this.appBounds = newBounds;
-
-        appNameTextBox = new TextBox("fonts/Roboto-Regular.ttf",
-            new BoundingBox(newBounds, 5, 90, 90, 99),
-            getAppName(),
-            textParameters);
-        resize();
-    }
-
     @Override
-    public abstract void resize();
+    public void resize(BoundingBox newBounds) {
+        this.appBounds = newBounds;
+        constructAppNameTextBox();
+    }
 
     @Override
     public String getAppName() {
@@ -69,10 +64,20 @@ public abstract class BaseApp implements IDashboardApp {
 
     protected void renderAppName(RenderInfo renderInfo) {
         if (spriteBatch.isDrawing()) {
+            if (appNameTextBox == null) {
+                constructAppNameTextBox();
+            }
             appNameTextBox.render(spriteBatch);
         } else {
             System.err.println("renderAppName was called before spriteBatch.begin() !!!");
         }
+    }
+
+    protected void constructAppNameTextBox() {
+        appNameTextBox = new TextBox("fonts/Roboto-Regular.ttf",
+            new BoundingBox(appBounds, 5, 90, 90, 99),
+            getAppName(),
+            textParameters);
     }
 
     public BoundingBox getBounds() {
