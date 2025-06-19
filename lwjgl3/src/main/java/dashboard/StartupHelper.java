@@ -1,4 +1,4 @@
-/*
+package dashboard;/*
  * Copyright 2020 damios
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 //Note, the above license and copyright applies to this file only.
-
-package dashboard.lwjgl3;
 
 import com.badlogic.gdx.Version;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3NativesLoader;
@@ -61,7 +59,7 @@ public class StartupHelper {
      *
      * <pre><code>
      * public static void main(String... args) {
-     * 	if (StartupHelper.startNewJvmIfRequired(true)) return; // This handles macOS support and helps on Windows.
+     * 	if (lwjgl3.StartupHelper.startNewJvmIfRequired(true)) return; // This handles macOS support and helps on Windows.
      * 	// after this is the actual main method code
      * }
      * </code></pre>
@@ -190,7 +188,7 @@ public class StartupHelper {
      *
      * <pre>
      * public static void main(String... args) {
-     * 	if (StartupHelper.startNewJvmIfRequired()) return; // This handles macOS support and helps on Windows.
+     * 	if (lwjgl3.StartupHelper.startNewJvmIfRequired()) return; // This handles macOS support and helps on Windows.
      * 	// the actual main method code
      * }
      * </pre>
