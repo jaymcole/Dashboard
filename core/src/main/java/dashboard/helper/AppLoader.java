@@ -141,6 +141,12 @@ public class AppLoader {
     }
 
     private static void createSettingsFile(FileHandle settingsFile, AppInfo info) {
+        FileHandle settingsFolder = Gdx.files.external(AppSettingsFolder);
+        if (!settingsFolder.exists()) {
+            System.out.println("Directory Does not exist");
+            settingsFolder.mkdirs();
+        }
+
         if(settingsFile.exists()) {
             System.out.println("Found existing save file for " + info.getSaveFileName());
         } else {
