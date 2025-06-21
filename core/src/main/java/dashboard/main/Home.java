@@ -32,6 +32,8 @@ import static dashboard.miscDataObjects.AppInfo.APP_PADDING;
 /** First screen of the application. Displayed after the application is created. */
 public class Home implements Screen {
 
+    private static final String APP_VERSION = "1.0.0";
+
     private SpriteBatch spriteBatch;
     private ShapeRenderer shapeRenderer;
     private List<AppInfo> apps;
@@ -97,16 +99,6 @@ public class Home implements Screen {
 
 
 
-
-
-
-
-
-
-
-
-
-
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -131,6 +123,14 @@ public class Home implements Screen {
             renderSettings();
         }
 
+
+        List<String> informationLines = new ArrayList<>();
+        informationLines.add("Version: " + APP_VERSION);
+        informationLines.add("FPS: " + Gdx.graphics.getFramesPerSecond());
+        spriteBatch.begin();
+        debugFont.setColor(Color.CYAN);
+        debugFont.draw(spriteBatch, String.join("\n", informationLines), 10, Gdx.graphics.getHeight() - 10);
+        spriteBatch.end();
     }
 
     private void renderSettings() {
