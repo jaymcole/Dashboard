@@ -8,4 +8,5 @@ dependencies {
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
   }
+  implementation("com.fasterxml.jackson.core:jackson-databind:2.0.1")
 }

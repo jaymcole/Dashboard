@@ -97,8 +97,6 @@ public class Home implements Screen {
         }
     }
 
-
-
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -122,7 +120,6 @@ public class Home implements Screen {
         if (settingsOpened != null) {
             renderSettings();
         }
-
 
         List<String> informationLines = new ArrayList<>();
         informationLines.add("Version: " + APP_VERSION);

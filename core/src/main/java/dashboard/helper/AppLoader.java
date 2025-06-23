@@ -8,6 +8,7 @@ import dashboard.apps.clockApp.ClockApp;
 import dashboard.apps.testApps.BoundingBoxTestApp;
 import dashboard.apps.testApps.DebugBordersApp;
 import dashboard.apps.testApps.TextureTestApp;
+import dashboard.apps.weatherApp.WeatherApp;
 import dashboard.miscDataObjects.AppInfo;
 import dashboard.rendering.BoundingBox;
 
@@ -28,6 +29,7 @@ public class AppLoader {
     public static final String ClockAppShorthand = "C__A";
     public static final String TextureTextAppShorthand = "TT_A";
     public static final String BoundingBoxTestAppShorthand = "BBTA";
+    public static final String WeatherAppShorthand = "WA_A";
 
     private static final String SettingsKeyValueDelimiter = "greatbarrierreef";
     private static final String AppSettingsFolder = "DashboardApp/appSettings/";
@@ -122,6 +124,7 @@ public class AppLoader {
                 new AppInfo(new TextureTestApp(appBounds), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
             case BoundingBoxTestAppShorthand ->
                 new AppInfo(new BoundingBoxTestApp(appBounds), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
+            case WeatherAppShorthand -> new AppInfo(new WeatherApp(appBounds), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
             default -> new AppInfo(new DebugBordersApp(appBounds, Color.BLUE), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
         };
 

@@ -2,17 +2,30 @@ package dashboard.apps.weatherApp;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import dashboard.apps.BaseApp;
+import dashboard.apps.weatherApp.weatherDataObjects.ForecastPeriod;
 import dashboard.miscDataObjects.RenderInfo;
 import dashboard.miscDataObjects.UpdateInfo;
 import dashboard.rendering.BoundingBox;
+import dashboard.rendering.TextBox;
 
 import java.util.HashMap;
 import java.util.List;
 
 public class WeatherApp extends BaseApp {
 
+    private static final float FORECAST_UPDATE_FREQUENCY_IN_SECONDS = 180; // 3 minutes
+
+    private float timeSinceLastUpdate;
+    private List<ForecastPeriod> forecastPeriods;
+
+    private TextBox temperatureTextBox;
+    private TextBox shortForecastTextBox;
+    private TextBox lastUpdateTextBox;
+
     public WeatherApp(BoundingBox appBounds) {
         super(appBounds);
+        timeSinceLastUpdate = FORECAST_UPDATE_FREQUENCY_IN_SECONDS;
+        updateForecastIfOld();
     }
 
     @Override
@@ -22,17 +35,56 @@ public class WeatherApp extends BaseApp {
 
     @Override
     public void update(UpdateInfo updateInfo) {
-
+        timeSinceLastUpdate += updateInfo.delta;
+        updateForecastIfOld();
+        if (forecastPeriods != null && !forecastPeriods.isEmpty()) {
+            temperatureTextBox.setTextWithoutFontResize(forecastPeriods.get(0).temperature + "°F");
+            shortForecastTextBox.setTextWithoutFontResize(forecastPeriods.get(0).shortForecast);
+            lastUpdateTextBox.setTextWithoutFontResize(FORECAST_UPDATE_FREQUENCY_IN_SECONDS - Math.round(timeSinceLastUpdate) + "s");
+        }
     }
 
     @Override
     public void render(RenderInfo renderInfo) {
-
+        if (forecastPeriods != null && !forecastPeriods.isEmpty()) {
+            matrix.setToOrtho2D(0, 0, appBounds.getWidth(), appBounds.getHeight());
+            spriteBatch.setProjectionMatrix(matrix);
+            spriteBatch.begin();
+            temperatureTextBox.render(spriteBatch);
+            shortForecastTextBox.render(spriteBatch);
+            lastUpdateTextBox.render(spriteBatch);
+            spriteBatch.end();
+        }
     }
 
     @Override
     protected void resizeApp() {
+        temperatureTextBox = new TextBox("fonts/Roboto-Regular.ttf",
+            new BoundingBox(appBounds, 0, 50, 100, 100),
+            "00000",
+            textParameters);
 
+        shortForecastTextBox = new TextBox("fonts/Roboto-Regular.ttf",
+            new BoundingBox(appBounds, 0, 20, 100, 50),
+            "  Mostly cloudy  ",
+            textParameters);
+
+        lastUpdateTextBox = new TextBox("fonts/Roboto-Regular.ttf",
+            new BoundingBox(appBounds, 0, 0, 100, 20),
+            "000000000000",
+            textParameters);
+    }
+
+    private void updateForecastIfOld() {
+        if (timeSinceLastUpdate >= FORECAST_UPDATE_FREQUENCY_IN_SECONDS) {
+            // Reset even if update fails, so we don't try to get weather every frame
+            timeSinceLastUpdate = 0;
+            try {
+                forecastPeriods = WeatherServices.getGovWeatherForecast("SEW", "125", "68", true);
+            } catch (Exception e) {
+                System.err.println("Something broke");
+            }
+        }
     }
 
     @Override
