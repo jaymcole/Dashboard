@@ -32,8 +32,8 @@ import static dashboard.miscDataObjects.AppInfo.APP_PADDING;
 /** First screen of the application. Displayed after the application is created. */
 public class Home implements Screen {
 
-    private static final String APP_VERSION = "1.0.1";
-    private static final String LAST_UPDATE_MESSAGE = "Increased weather app update frequency";
+    private static final String APP_VERSION = "1.0.2";
+    private static final String LAST_UPDATE_MESSAGE = "Make weather report call async";
 
     private SpriteBatch spriteBatch;
     private ShapeRenderer shapeRenderer;

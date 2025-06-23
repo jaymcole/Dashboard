@@ -8,6 +8,7 @@ import dashboard.miscDataObjects.UpdateInfo;
 import dashboard.rendering.BoundingBox;
 import dashboard.rendering.TextBox;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -77,13 +78,20 @@ public class WeatherApp extends BaseApp {
 
     private void updateForecastIfOld() {
         if (timeSinceLastUpdate >= FORECAST_UPDATE_FREQUENCY_IN_SECONDS) {
-            // Reset even if update fails, so we don't try to get weather every frame
             timeSinceLastUpdate = 0;
-            try {
-                forecastPeriods = WeatherServices.getGovWeatherForecast("SEW", "125", "68", true);
-            } catch (Exception e) {
-                System.err.println("Something broke");
-            }
+            WeatherServices.getGovWeatherForecastAsync("SEW", "125", "68", true).whenComplete((result, exception) -> {
+                if (exception != null) {
+                    System.err.println("Error in successFuture: " + exception.getMessage());
+                } else {
+                    try {
+                        System.out.println("Received weather report update");
+                        forecastPeriods = WeatherServices.parseGovWeatherForecastPeriodsFromResponse(result);
+                    } catch (IOException e) {
+                        System.err.println("Failed to retrieved weather forecasts: " + e.getMessage());
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
         }
     }
 
