@@ -41,7 +41,7 @@ public class WeatherApp extends BaseApp {
         if (forecastPeriods != null && !forecastPeriods.isEmpty()) {
             temperatureTextBox.setTextWithoutFontResize(forecastPeriods.get(0).temperature + "°F");
             shortForecastTextBox.setTextWithoutFontResize(forecastPeriods.get(0).shortForecast);
-            lastUpdateTextBox.setTextWithoutFontResize(FORECAST_UPDATE_FREQUENCY_IN_SECONDS - Math.round(timeSinceLastUpdate) + "s");
+            lastUpdateTextBox.setTextWithoutFontResize(String.format("%.2f", FORECAST_UPDATE_FREQUENCY_IN_SECONDS - timeSinceLastUpdate) + "s");
         }
     }
 
@@ -67,7 +67,7 @@ public class WeatherApp extends BaseApp {
 
         shortForecastTextBox = new TextBox("fonts/Roboto-Regular.ttf",
             new BoundingBox(appBounds, 0, 20, 100, 50),
-            "  Mostly cloudy  ",
+            " Mostly something ",
             textParameters);
 
         lastUpdateTextBox = new TextBox("fonts/Roboto-Regular.ttf",
@@ -86,6 +86,7 @@ public class WeatherApp extends BaseApp {
                     try {
                         System.out.println("Received weather report update");
                         forecastPeriods = WeatherServices.parseGovWeatherForecastPeriodsFromResponse(result);
+                        timeSinceLastUpdate = 0;
                     } catch (IOException e) {
                         System.err.println("Failed to retrieved weather forecasts: " + e.getMessage());
                         throw new RuntimeException(e);
