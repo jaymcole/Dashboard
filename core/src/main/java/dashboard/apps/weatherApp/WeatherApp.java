@@ -13,7 +13,7 @@ import java.util.List;
 
 public class WeatherApp extends BaseApp {
 
-    private static final float FORECAST_UPDATE_FREQUENCY_IN_SECONDS = 180; // 3 minutes
+    private static final float FORECAST_UPDATE_FREQUENCY_IN_SECONDS = 30; // 3 minutes
 
     private float timeSinceLastUpdate;
     private List<ForecastPeriod> forecastPeriods;

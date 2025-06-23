@@ -32,7 +32,8 @@ import static dashboard.miscDataObjects.AppInfo.APP_PADDING;
 /** First screen of the application. Displayed after the application is created. */
 public class Home implements Screen {
 
-    private static final String APP_VERSION = "1.0.0";
+    private static final String APP_VERSION = "1.0.1";
+    private static final String LAST_UPDATE_MESSAGE = "Increased weather app update frequency";
 
     private SpriteBatch spriteBatch;
     private ShapeRenderer shapeRenderer;
@@ -122,6 +123,7 @@ public class Home implements Screen {
         }
 
         List<String> informationLines = new ArrayList<>();
+        informationLines.add("Message: " + LAST_UPDATE_MESSAGE);
         informationLines.add("Version: " + APP_VERSION);
         informationLines.add("FPS: " + Gdx.graphics.getFramesPerSecond());
         spriteBatch.begin();
