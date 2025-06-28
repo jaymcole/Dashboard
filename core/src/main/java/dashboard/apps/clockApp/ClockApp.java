@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import dashboard.apps.BaseApp;
 import dashboard.helper.StringHelper;
+import dashboard.miscDataObjects.AppConfigs;
 import dashboard.miscDataObjects.RenderInfo;
 import dashboard.miscDataObjects.UpdateInfo;
 import dashboard.rendering.graphs.BoundingBox;
@@ -31,8 +32,8 @@ public class ClockApp extends BaseApp {
     private TextBox clockBox;
     private ClockHourFormat format;
 
-    public ClockApp(BoundingBox appBounds, String[] args) {
-        super(appBounds,args);
+    public ClockApp(BoundingBox appBounds, AppConfigs configs) {
+        super(appBounds, configs);
         format = ClockHourFormat.HOUR_12;
     }
 

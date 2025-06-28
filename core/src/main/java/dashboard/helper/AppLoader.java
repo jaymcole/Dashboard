@@ -3,6 +3,8 @@ package dashboard.helper;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dashboard.apps.bouncingBalls.BouncingBallsApp;
 import dashboard.apps.clockApp.ClockApp;
 import dashboard.apps.graphApps.AppPerformanceMonitor;
@@ -10,6 +12,7 @@ import dashboard.apps.testApps.BoundingBoxTestApp;
 import dashboard.apps.testApps.DebugBordersApp;
 import dashboard.apps.testApps.TextureTestApp;
 import dashboard.apps.weatherApp.WeatherApp;
+import dashboard.miscDataObjects.AppConfigs;
 import dashboard.miscDataObjects.AppInfo;
 import dashboard.rendering.graphs.BoundingBox;
 
@@ -64,9 +67,12 @@ public class AppLoader {
         }
     }
 
-    public static List<AppInfo> loadAppsFromLayoutFile(String appLayoutCSVPath) throws IOException {
+    public static List<AppInfo> loadAppsFromLayoutFile(String appDataPath) throws IOException {
+        FileHandle appConfigsKeyFile = Gdx.files.internal(appDataPath + ".key.json");
+        Map<String, AppConfigs> appConfigsMap = loadAppConfigsMap(appConfigsKeyFile);
+
         List<AppInfo> apps = new ArrayList<>();
-        List<String[]> layout = readLayoutFile(Gdx.files.internal(appLayoutCSVPath));
+        List<String[]> layout = readLayoutFile(Gdx.files.internal(appDataPath + ".layout"));
 
         Total_Rows = layout.get(0).length;
         Total_Columns = layout.size();
@@ -74,14 +80,27 @@ public class AppLoader {
         for(int row = 0; row < layout.size(); row++) {
             for(int col = 0; col < layout.get(row).length; col++) {
                 if (layout.get(row)[col].compareTo(EmptySpace) != 0 && layout.get(row)[col].compareTo(SeenSpace) != 0) {
-                    exploreLayoutAndInstantiateApp(apps, layout, row, col);
+                    exploreLayoutAndInstantiateApp(apps, layout, row, col, appConfigsMap);
                 }
             }
         }
         return apps;
     }
 
-    private static void exploreLayoutAndInstantiateApp(List<AppInfo> apps, List<String[]> layout, int row, int col) {
+    private static Map<String, AppConfigs> loadAppConfigsMap(FileHandle appConfigsKeyFile) throws IOException {
+        String configContext = appConfigsKeyFile.readString();
+        ObjectMapper mapper = new ObjectMapper();
+        TypeReference<HashMap<String,Object>> typeRef
+            = new TypeReference<HashMap<String,Object>>() {};
+        Map<String, Object> configObjects = mapper.<HashMap<String, Object>>readValue(configContext, typeRef);
+        HashMap<String, AppConfigs> appConfigs = new HashMap<>();
+        for(Map.Entry<String, Object> config : configObjects.entrySet()) {
+            appConfigs.put(config.getKey(), new AppConfigs((Map<String, Object>)config.getValue()));
+        }
+        return appConfigs;
+    }
+
+    private static void exploreLayoutAndInstantiateApp(List<AppInfo> apps, List<String[]> layout, int row, int col, Map<String, AppConfigs> appConfigsMap) {
         String entry = layout.get(row)[col];
         int endColumn = col;
         while (endColumn <= layout.get(row).length-2 && layout.get(row)[endColumn+1].compareTo(entry) == 0) {
@@ -111,24 +130,30 @@ public class AppLoader {
             shorthand = parts[0];
             optionalSaveSuffix = parts[1];
         }
+        AppConfigs configs = null;
+        try {
+            configs = appConfigsMap.getOrDefault(shorthand, AppConfigs.getDefaultEmptyConfigs());
 
-        apps.add(instantiateApp(shorthand, optionalSaveSuffix, Math.abs((layout.size()-1) - row), col, endColumn, endRow));
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+        apps.add(instantiateApp(configs, optionalSaveSuffix, Math.abs((layout.size()-1) - row), col, endColumn, endRow));
     }
 
-    private static AppInfo instantiateApp(String shorthand, String optionalSaveSuffix, int row, int col, int horizontalCellCount, int verticalCellCount) {
+    private static AppInfo instantiateApp(AppConfigs configs, String optionalSaveSuffix, int row, int col, int horizontalCellCount, int verticalCellCount) {
         BoundingBox appBounds = calculateAppBoundingBox(horizontalCellCount, verticalCellCount);
 
-        AppInfo info = switch (shorthand) {
+        AppInfo info = switch (configs.appClass) {
             case BouncingBallAppShorthand ->
-                new AppInfo(new BouncingBallsApp(appBounds, new String[]{}), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
-            case ClockAppShorthand -> new AppInfo(new ClockApp(appBounds, new String[]{}), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
+                new AppInfo(new BouncingBallsApp(appBounds, configs), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
+            case ClockAppShorthand -> new AppInfo(new ClockApp(appBounds, configs), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
             case TextureTextAppShorthand ->
-                new AppInfo(new TextureTestApp(appBounds, new String[]{}), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
+                new AppInfo(new TextureTestApp(appBounds, configs), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
             case BoundingBoxTestAppShorthand ->
-                new AppInfo(new BoundingBoxTestApp(appBounds, new String[]{}), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
-            case WeatherAppShorthand -> new AppInfo(new WeatherApp(appBounds, new String[]{}), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
-            case PerformanceMonitorShorthand -> new AppInfo(new AppPerformanceMonitor(appBounds, new String[]{}), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
-            default -> new AppInfo(new DebugBordersApp(appBounds, Color.BLUE, new String[]{}), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
+                new AppInfo(new BoundingBoxTestApp(appBounds, configs), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
+            case WeatherAppShorthand -> new AppInfo(new WeatherApp(appBounds, configs), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
+            case PerformanceMonitorShorthand -> new AppInfo(new AppPerformanceMonitor(appBounds, configs), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
+            default -> new AppInfo(new DebugBordersApp(appBounds, Color.BLUE, configs), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
         };
 
         FileHandle settingsFile = Gdx.files.external(AppSettingsFolder + info.getSaveFileName());

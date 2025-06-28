@@ -33,8 +33,8 @@ import static dashboard.miscDataObjects.AppInfo.APP_PADDING;
 /** First screen of the application. Displayed after the application is created. */
 public class Home implements Screen {
 
-    private static final String APP_VERSION = "1.0.4";
-    private static final String LAST_UPDATE_MESSAGE = "Add line graph";
+    private static final String APP_VERSION = "1.0.5";
+    private static final String LAST_UPDATE_MESSAGE = "Refactor app loader to take a layout file and configs file";
 
     private SpriteBatch spriteBatch;
     private ShapeRenderer shapeRenderer;
@@ -57,7 +57,7 @@ public class Home implements Screen {
         random = new Random();
         apps = new ArrayList<>();
         try {
-            apps = AppLoader.loadAppsFromLayoutFile("layouts/testAppLayout.csv");
+            apps = AppLoader.loadAppsFromLayoutFile("layouts/testAppLayout");
             calculateAppInfo();
         } catch (IOException e) {
             throw new RuntimeException(e);

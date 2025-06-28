@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import dashboard.apps.BaseApp;
 import dashboard.main.Home;
+import dashboard.miscDataObjects.AppConfigs;
 import dashboard.miscDataObjects.RenderInfo;
 import dashboard.miscDataObjects.Stat;
 import dashboard.miscDataObjects.UpdateInfo;
@@ -20,8 +21,8 @@ public class AppPerformanceMonitor extends BaseApp {
     private LineGraph graph;
     private BoundingBox graphBounds;
 
-    public AppPerformanceMonitor(BoundingBox appBounds, String[] args) {
-        super(appBounds,args);
+    public AppPerformanceMonitor(BoundingBox appBounds, AppConfigs configs) {
+        super(appBounds, configs);
     }
 
     @Override

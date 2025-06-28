@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import dashboard.apps.BaseApp;
+import dashboard.miscDataObjects.AppConfigs;
 import dashboard.miscDataObjects.RenderInfo;
 import dashboard.miscDataObjects.UpdateInfo;
 import dashboard.rendering.graphs.BoundingBox;
@@ -101,8 +102,8 @@ public class BouncingBallsApp extends BaseApp {
 
     private float gravity = 9.8f;
 
-    public BouncingBallsApp(BoundingBox appBounds, String[] args) {
-        super(appBounds,args);
+    public BouncingBallsApp(BoundingBox appBounds, AppConfigs configs) {
+        super(appBounds, configs);
         random = new Random();
         balls = new ArrayList<>();
     }

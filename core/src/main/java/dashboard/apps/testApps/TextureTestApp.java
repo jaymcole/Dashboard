@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import dashboard.apps.BaseApp;
+import dashboard.miscDataObjects.AppConfigs;
 import dashboard.miscDataObjects.RenderInfo;
 import dashboard.miscDataObjects.UpdateInfo;
 import dashboard.rendering.graphs.BoundingBox;
@@ -17,8 +18,8 @@ public class TextureTestApp extends BaseApp {
     private final Texture texture;
     private BoundingBox squareBounds;
 
-    public TextureTestApp(BoundingBox appBounds, String[] args) {
-        super(appBounds,args);
+    public TextureTestApp(BoundingBox appBounds, AppConfigs configs) {
+        super(appBounds, configs);
         this.texture = new Texture(Gdx.files.internal("libgdx128.png"));
         squareBounds = appBounds.getLargestSquare();
     }

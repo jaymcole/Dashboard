@@ -3,6 +3,7 @@ package dashboard.apps.weatherApp;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import dashboard.apps.BaseApp;
 import dashboard.apps.weatherApp.weatherDataObjects.ForecastPeriod;
+import dashboard.miscDataObjects.AppConfigs;
 import dashboard.miscDataObjects.RenderInfo;
 import dashboard.miscDataObjects.UpdateInfo;
 import dashboard.rendering.graphs.BoundingBox;
@@ -23,8 +24,8 @@ public class WeatherApp extends BaseApp {
     private TextBox shortForecastTextBox;
     private TextBox lastUpdateTextBox;
 
-    public WeatherApp(BoundingBox appBounds, String[] args) {
-        super(appBounds,args);
+    public WeatherApp(BoundingBox appBounds, AppConfigs configs) {
+        super(appBounds, configs);
         timeSinceLastUpdate = FORECAST_UPDATE_FREQUENCY_IN_SECONDS;
         updateForecastIfOld();
     }

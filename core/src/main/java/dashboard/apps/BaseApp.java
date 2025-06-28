@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import dashboard.enums.TextHorizontalAlignment;
 import dashboard.enums.TextVerticalAlignment;
+import dashboard.miscDataObjects.AppConfigs;
 import dashboard.miscDataObjects.RenderInfo;
 import dashboard.miscDataObjects.TextParameters;
 import dashboard.miscDataObjects.UpdateInfo;
@@ -22,7 +23,7 @@ public abstract class BaseApp implements IDashboardApp {
     private TextBox appNameTextBox;
     protected TextParameters textParameters;
 
-    public BaseApp(BoundingBox appBounds, String[] args) {
+    public BaseApp(BoundingBox appBounds, AppConfigs configs) {
         textParameters = new TextParameters();
         textParameters.horizontalAlignment = TextHorizontalAlignment.CENTER;
         textParameters.verticalAlignment = TextVerticalAlignment.CENTER;

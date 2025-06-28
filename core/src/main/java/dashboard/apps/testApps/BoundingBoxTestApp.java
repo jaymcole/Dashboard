@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import dashboard.apps.BaseApp;
+import dashboard.miscDataObjects.AppConfigs;
 import dashboard.miscDataObjects.RenderInfo;
 import dashboard.miscDataObjects.UpdateInfo;
 import dashboard.rendering.graphs.BoundingBox;
@@ -17,8 +18,8 @@ public class BoundingBoxTestApp extends BaseApp {
     private List<BoundingBox> testBoundingBoxes;
     private List<Color> boxColors;
 
-    public BoundingBoxTestApp(BoundingBox appBounds, String[] args) {
-        super(appBounds,args);
+    public BoundingBoxTestApp(BoundingBox appBounds, AppConfigs configs) {
+        super(appBounds, configs);
     }
 
     @Override
