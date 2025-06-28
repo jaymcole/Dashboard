@@ -24,6 +24,7 @@ public class AppPerformanceMonitor extends BaseApp {
     private List<String> suffixes;
     private List<String> dataSources;
     private final int yCeiling;
+    private final boolean autoscaleGraph;
     private Map<String, List<Stat>> dataSourceLists = new HashMap<>();
 
     public AppPerformanceMonitor(BoundingBox appBounds, AppConfigs configs) {
@@ -31,6 +32,7 @@ public class AppPerformanceMonitor extends BaseApp {
         yCeiling = (int)configs.appArgs.getOrDefault("yCeiling", 1);
         suffixes = (List<String>)configs.appArgs.getOrDefault("dataSourcesWithSuffix", new ArrayList<String>());
         dataSources = (List<String>)configs.appArgs.getOrDefault("dataSources", new ArrayList<String>());
+        autoscaleGraph = (boolean)configs.appArgs.getOrDefault("autoscaling", false);
 
         new Thread(new Runnable() {
             public void run() {
@@ -98,6 +100,6 @@ public class AppPerformanceMonitor extends BaseApp {
     protected void resizeApp() {
         refreshDataSources();
         graphBounds = new BoundingBox(appBounds, 0, 0, 100, 100);
-        graph = new LineGraph(graphBounds, dataSourceLists, 1000, yCeiling);
+        graph = new LineGraph(graphBounds, dataSourceLists, 1000, yCeiling, autoscaleGraph);
     }
 }

@@ -34,14 +34,15 @@ public class LineGraph {
     private final Map<String, Color> statsColors;
 
     private final int timeframe;
-    private final int yCeiling;
-
+    private int yCeiling;
+    private final boolean autoscale;
     private BitmapFont debugFont;
 
-    public LineGraph(BoundingBox bounds, Map<String, List<Stat>> statsToPlot, int timeframe, int yCeiling) {
+    public LineGraph(BoundingBox bounds, Map<String, List<Stat>> statsToPlot, int timeframe, int yCeiling, boolean autoscale) {
         this.statsToPlot = statsToPlot;
         this.timeframe = timeframe;
         this.yCeiling = yCeiling;
+        this.autoscale = autoscale;
         resize(bounds);
         debugFont = FontHelper.loadFont("fonts/Roboto-Regular.ttf", 16);
         statsColors = new HashMap<>();
@@ -73,13 +74,15 @@ public class LineGraph {
             shapeRenderer.line(x1, y1, x2, y1);
         }
 
-
+        // Used for autoscaling the graph.
+        int highestValue = 0;
         for (Map.Entry<String, List<Stat>> entry : statsToPlot.entrySet()) {
             List<Stat> stats = entry.getValue();
             shapeRenderer.setColor(statsColors.get(entry.getKey()));
 
             long currentTime = System.currentTimeMillis();
             for (int i = entry.getValue().size() - 1; i > 1; i--) {
+                highestValue = Math.max(highestValue, (int)stats.get(i).statMetric);
 
                 float x1 = (stats.get(i).timeStamp - currentTime) / 10.0f;
                 float y1 = stats.get(i).statMetric / yCeiling;
@@ -113,9 +116,14 @@ public class LineGraph {
                 if (x1 < graphMaxBounds.getX()) {
                     break;
                 }
+
             }
         }
         shapeRenderer.end();
+
+        if (autoscale) {
+            yCeiling = highestValue;
+        }
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.WHITE);

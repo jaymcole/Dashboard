@@ -33,8 +33,8 @@ import static dashboard.miscDataObjects.AppInfo.APP_PADDING;
 /** First screen of the application. Displayed after the application is created. */
 public class Home implements Screen {
 
-    private static final String APP_VERSION = "1.0.6";
-    private static final String LAST_UPDATE_MESSAGE = "Make graph app take data sources from input file";
+    private static final String APP_VERSION = "1.0.7";
+    private static final String LAST_UPDATE_MESSAGE = "Autoscale performance graph";
 
     private SpriteBatch spriteBatch;
     private ShapeRenderer shapeRenderer;
