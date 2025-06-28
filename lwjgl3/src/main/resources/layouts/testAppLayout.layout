@@ -1,3 +1,5 @@
 BouncingBalls_1,Clock_1 1,fake 3
 WeatherApp_1,Clock_2 2,BouncingBalls_2
 PerformanceGraph,PerformanceGraph,PerformanceGraph
+PerformanceGraph,PerformanceGraph,PerformanceGraph
+PerformanceGraph_fps,PerformanceGraph_fps,PerformanceGraph_fps

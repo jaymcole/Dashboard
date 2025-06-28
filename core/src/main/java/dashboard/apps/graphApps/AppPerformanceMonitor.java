@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import dashboard.apps.BaseApp;
-import dashboard.main.Home;
+import dashboard.main.StatsManager;
 import dashboard.miscDataObjects.AppConfigs;
 import dashboard.miscDataObjects.RenderInfo;
 import dashboard.miscDataObjects.Stat;
@@ -12,6 +12,7 @@ import dashboard.miscDataObjects.UpdateInfo;
 import dashboard.rendering.LineGraph;
 import dashboard.rendering.graphs.BoundingBox;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,9 +21,29 @@ public class AppPerformanceMonitor extends BaseApp {
 
     private LineGraph graph;
     private BoundingBox graphBounds;
+    private List<String> suffixes;
+    private List<String> dataSources;
+    private final int yCeiling;
+    private Map<String, List<Stat>> dataSourceLists = new HashMap<>();
 
     public AppPerformanceMonitor(BoundingBox appBounds, AppConfigs configs) {
         super(appBounds, configs);
+        yCeiling = (int)configs.appArgs.getOrDefault("yCeiling", 1);
+        suffixes = (List<String>)configs.appArgs.getOrDefault("dataSourcesWithSuffix", new ArrayList<String>());
+        dataSources = (List<String>)configs.appArgs.getOrDefault("dataSources", new ArrayList<String>());
+
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    System.out.println("Starting wait");
+                    Thread.sleep(1000);
+                    System.out.println("Done waiting");
+                    resizeApp();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }).start();
     }
 
     @Override
@@ -38,20 +59,15 @@ public class AppPerformanceMonitor extends BaseApp {
     @Override
     public void render(RenderInfo renderInfo) {
         matrix.setToOrtho2D(0, 0, appBounds.getWidth(), appBounds.getHeight());
-
+        spriteBatch.setProjectionMatrix(matrix);
         shapeRenderer.setProjectionMatrix(matrix);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
 
-        graph.render(shapeRenderer);
-        shapeRenderer.end();
+        graph.render(shapeRenderer, spriteBatch);
 
-        matrix.setToOrtho2D(0, 0, appBounds.getWidth(), appBounds.getHeight());
-        shapeRenderer.setProjectionMatrix(matrix);
         shapeRenderer.setColor(Color.MAGENTA);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         graphBounds.render(shapeRenderer);
-        shapeRenderer.end();
-    }
+        shapeRenderer.end();}
 
     @Override
     public HashMap<String, String> saveSettings() {
@@ -63,11 +79,25 @@ public class AppPerformanceMonitor extends BaseApp {
         return List.of();
     }
 
+    private void refreshDataSources() {
+        dataSourceLists = new HashMap<>();
+        if (suffixes != null) {
+            for(String suffix : suffixes) {
+                dataSourceLists.putAll(StatsManager.getAllStatsWithSuffix(suffix));
+            }
+        }
+
+        if (dataSources != null) {
+            for(String dataSource : dataSources) {
+                dataSourceLists.putAll(StatsManager.getAllStatsWithSuffix(dataSource));
+            }
+        }
+    }
+
     @Override
     protected void resizeApp() {
-        Map<String, List<Stat>> statsToPlot = new HashMap<>();
-        statsToPlot.put("FPS", Home.FPSHistory);
-        graphBounds = new BoundingBox(appBounds, 5, 5, 95, 95);
-        graph = new LineGraph(graphBounds, statsToPlot, 1000, 100000);
+        refreshDataSources();
+        graphBounds = new BoundingBox(appBounds, 0, 0, 100, 100);
+        graph = new LineGraph(graphBounds, dataSourceLists, 1000, yCeiling);
     }
 }

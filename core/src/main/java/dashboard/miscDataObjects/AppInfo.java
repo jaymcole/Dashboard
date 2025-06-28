@@ -22,7 +22,7 @@ public class AppInfo {
     // Used to separate save files for the same app
     // Example: you have two clock apps on your dashboard with different timezones. We'll want separate save files for the two different instances.
     // prefix is set in layout-file "<app code> <save suffix>"
-    private final String optionalSaveSuffix;
+    public final String uniqueAppName;
 
     public final BaseApp app;
     public int xCell; // top-most row
@@ -42,7 +42,7 @@ public class AppInfo {
     private final List<String> errorMessages;
 
     public AppInfo (BaseApp app, int xCell, int yCell, int xCellCount, int yCellCount, String saveSuffix) {
-        this.optionalSaveSuffix = saveSuffix;
+        this.uniqueAppName = saveSuffix;
         errorMessages = new ArrayList<>();
         this.app = app;
         this.xCell = xCell;
@@ -108,6 +108,6 @@ public class AppInfo {
     }
 
     public String getSaveFileName() {
-        return app.getAppName() + optionalSaveSuffix + ".save";
+        return app.getAppName() + uniqueAppName + ".save";
     }
 }

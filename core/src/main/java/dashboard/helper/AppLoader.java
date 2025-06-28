@@ -130,14 +130,8 @@ public class AppLoader {
             shorthand = parts[0];
             optionalSaveSuffix = parts[1];
         }
-        AppConfigs configs = null;
-        try {
-            configs = appConfigsMap.getOrDefault(shorthand, AppConfigs.getDefaultEmptyConfigs());
-
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
-        }
-        apps.add(instantiateApp(configs, optionalSaveSuffix, Math.abs((layout.size()-1) - row), col, endColumn, endRow));
+        AppConfigs configs = appConfigsMap.getOrDefault(shorthand, AppConfigs.getDefaultEmptyConfigs());
+        apps.add(instantiateApp(configs, shorthand, Math.abs((layout.size()-1) - row), col, endColumn, endRow));
     }
 
     private static AppInfo instantiateApp(AppConfigs configs, String optionalSaveSuffix, int row, int col, int horizontalCellCount, int verticalCellCount) {

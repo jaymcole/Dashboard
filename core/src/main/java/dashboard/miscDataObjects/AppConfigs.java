@@ -8,11 +8,11 @@ public class AppConfigs {
     public static final String APP_ARGS_KEY = "appArgs";
 
     public final String appClass;
-    public final Object appArgs;
+    public final Map<String, Object> appArgs;
 
     public AppConfigs(Map<String, Object> configs) {
         appClass = (String)configs.getOrDefault(APP_CLASS_KEY, "missing");
-        appArgs = configs.getOrDefault(APP_ARGS_KEY, null);
+        appArgs = (Map<String, Object>)configs.getOrDefault(APP_ARGS_KEY, new HashMap<String, Object>());
     }
 
     public static AppConfigs getDefaultEmptyConfigs() {

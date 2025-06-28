@@ -33,8 +33,8 @@ import static dashboard.miscDataObjects.AppInfo.APP_PADDING;
 /** First screen of the application. Displayed after the application is created. */
 public class Home implements Screen {
 
-    private static final String APP_VERSION = "1.0.5";
-    private static final String LAST_UPDATE_MESSAGE = "Refactor app loader to take a layout file and configs file";
+    private static final String APP_VERSION = "1.0.6";
+    private static final String LAST_UPDATE_MESSAGE = "Make graph app take data sources from input file";
 
     private SpriteBatch spriteBatch;
     private ShapeRenderer shapeRenderer;
@@ -45,8 +45,6 @@ public class Home implements Screen {
     private AppInfo settingsOpened = null;
     private Stage stage;
     private Random random;
-
-    public static final List<Stat> FPSHistory = new ArrayList<>();
 
     @Override
     public void show() {
@@ -102,23 +100,32 @@ public class Home implements Screen {
         }
     }
 
+    private float timeSinceLastStatSave = 0;
+    private float statSaveFrequency = 0.05f;
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        long appTimeStart = 0;
-        long appTimeEnd = 0;
+        timeSinceLastStatSave += delta;
         for(AppInfo info : apps) {
             if (!brokenApps.contains(info)) {
-                appTimeStart = System.nanoTime();
+                long appTimeStart = System.nanoTime();
                 updateApp(info, delta);
                 renderAppToFrameBuffer(info);
-                appTimeEnd = System.nanoTime();
+                long appTimeEnd = System.nanoTime();
+
+                if (timeSinceLastStatSave > statSaveFrequency) {
+                    StatsManager.AddStatRecord(info.uniqueAppName + "_renderTime",(float)(appTimeEnd - appTimeStart));
+                }
             }
         }
 
-        renderAppsToHomeScreen();
+        if (timeSinceLastStatSave > statSaveFrequency) {
+            StatsManager.AddStatRecord("FPS", Gdx.graphics.getFramesPerSecond());
+            timeSinceLastStatSave = 0;
+        }
+
+            renderAppsToHomeScreen();
         renderOptionsButtonBoundingBoxes();
 
         for(AppInfo info : apps) {
@@ -138,13 +145,7 @@ public class Home implements Screen {
         debugFont.setColor(Color.CYAN);
         debugFont.draw(spriteBatch, String.join("\n", informationLines), 10, Gdx.graphics.getHeight() - 10);
         spriteBatch.end();
-
-        if (random.nextFloat() < 0.9f) {
-            FPSHistory.add(new Stat((float)(appTimeEnd - appTimeStart), System.currentTimeMillis()));
-        }
     }
-
-    private int lastValue = 50;
 
     private void renderSettings() {
         Gdx.input.setInputProcessor(stage);
