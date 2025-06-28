@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import dashboard.apps.BaseApp;
 import dashboard.miscDataObjects.RenderInfo;
 import dashboard.miscDataObjects.UpdateInfo;
-import dashboard.rendering.BoundingBox;
+import dashboard.rendering.graphs.BoundingBox;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -101,17 +101,14 @@ public class BouncingBallsApp extends BaseApp {
 
     private float gravity = 9.8f;
 
-    public BouncingBallsApp(BoundingBox appBounds) {
-        super(appBounds);
+    public BouncingBallsApp(BoundingBox appBounds, String[] args) {
+        super(appBounds,args);
         random = new Random();
         balls = new ArrayList<>();
     }
 
     @Override
     public void update(UpdateInfo updateInfo) {
-//        if (random.nextInt(1000) < 10) {
-//            random = null;
-//        }
         for(Ball ball : balls) {
             ball.update(updateInfo.delta, gravity);
         }

@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import dashboard.helper.FontHelper;
 import dashboard.miscDataObjects.TextParameters;
+import dashboard.rendering.graphs.BoundingBox;
 
 public class TextBox {
 

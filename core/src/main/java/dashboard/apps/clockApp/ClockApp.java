@@ -13,7 +13,7 @@ import dashboard.apps.BaseApp;
 import dashboard.helper.StringHelper;
 import dashboard.miscDataObjects.RenderInfo;
 import dashboard.miscDataObjects.UpdateInfo;
-import dashboard.rendering.BoundingBox;
+import dashboard.rendering.graphs.BoundingBox;
 import dashboard.rendering.TextBox;
 
 import java.time.LocalDateTime;
@@ -31,8 +31,8 @@ public class ClockApp extends BaseApp {
     private TextBox clockBox;
     private ClockHourFormat format;
 
-    public ClockApp(BoundingBox appBounds) {
-        super(appBounds);
+    public ClockApp(BoundingBox appBounds, String[] args) {
+        super(appBounds,args);
         format = ClockHourFormat.HOUR_12;
     }
 

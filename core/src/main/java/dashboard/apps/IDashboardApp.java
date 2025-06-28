@@ -4,7 +4,7 @@ package dashboard.apps;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import dashboard.miscDataObjects.RenderInfo;
 import dashboard.miscDataObjects.UpdateInfo;
-import dashboard.rendering.BoundingBox;
+import dashboard.rendering.graphs.BoundingBox;
 
 import java.util.HashMap;
 import java.util.List;

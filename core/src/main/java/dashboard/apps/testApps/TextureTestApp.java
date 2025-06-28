@@ -6,7 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import dashboard.apps.BaseApp;
 import dashboard.miscDataObjects.RenderInfo;
 import dashboard.miscDataObjects.UpdateInfo;
-import dashboard.rendering.BoundingBox;
+import dashboard.rendering.graphs.BoundingBox;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,8 +17,8 @@ public class TextureTestApp extends BaseApp {
     private final Texture texture;
     private BoundingBox squareBounds;
 
-    public TextureTestApp(BoundingBox appBounds) {
-        super(appBounds);
+    public TextureTestApp(BoundingBox appBounds, String[] args) {
+        super(appBounds,args);
         this.texture = new Texture(Gdx.files.internal("libgdx128.png"));
         squareBounds = appBounds.getLargestSquare();
     }

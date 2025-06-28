@@ -5,7 +5,7 @@ import dashboard.apps.BaseApp;
 import dashboard.apps.weatherApp.weatherDataObjects.ForecastPeriod;
 import dashboard.miscDataObjects.RenderInfo;
 import dashboard.miscDataObjects.UpdateInfo;
-import dashboard.rendering.BoundingBox;
+import dashboard.rendering.graphs.BoundingBox;
 import dashboard.rendering.TextBox;
 
 import java.io.IOException;
@@ -23,8 +23,8 @@ public class WeatherApp extends BaseApp {
     private TextBox shortForecastTextBox;
     private TextBox lastUpdateTextBox;
 
-    public WeatherApp(BoundingBox appBounds) {
-        super(appBounds);
+    public WeatherApp(BoundingBox appBounds, String[] args) {
+        super(appBounds,args);
         timeSinceLastUpdate = FORECAST_UPDATE_FREQUENCY_IN_SECONDS;
         updateForecastIfOld();
     }

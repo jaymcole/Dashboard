@@ -5,12 +5,13 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import dashboard.apps.bouncingBalls.BouncingBallsApp;
 import dashboard.apps.clockApp.ClockApp;
+import dashboard.apps.graphApps.AppPerformanceMonitor;
 import dashboard.apps.testApps.BoundingBoxTestApp;
 import dashboard.apps.testApps.DebugBordersApp;
 import dashboard.apps.testApps.TextureTestApp;
 import dashboard.apps.weatherApp.WeatherApp;
 import dashboard.miscDataObjects.AppInfo;
-import dashboard.rendering.BoundingBox;
+import dashboard.rendering.graphs.BoundingBox;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ public class AppLoader {
     public static final String TextureTextAppShorthand = "TT_A";
     public static final String BoundingBoxTestAppShorthand = "BBTA";
     public static final String WeatherAppShorthand = "WA_A";
+    public static final String PerformanceMonitorShorthand = "APMA";
 
     private static final String SettingsKeyValueDelimiter = "greatbarrierreef";
     private static final String AppSettingsFolder = "DashboardApp/appSettings/";
@@ -118,14 +120,15 @@ public class AppLoader {
 
         AppInfo info = switch (shorthand) {
             case BouncingBallAppShorthand ->
-                new AppInfo(new BouncingBallsApp(appBounds), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
-            case ClockAppShorthand -> new AppInfo(new ClockApp(appBounds), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
+                new AppInfo(new BouncingBallsApp(appBounds, new String[]{}), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
+            case ClockAppShorthand -> new AppInfo(new ClockApp(appBounds, new String[]{}), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
             case TextureTextAppShorthand ->
-                new AppInfo(new TextureTestApp(appBounds), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
+                new AppInfo(new TextureTestApp(appBounds, new String[]{}), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
             case BoundingBoxTestAppShorthand ->
-                new AppInfo(new BoundingBoxTestApp(appBounds), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
-            case WeatherAppShorthand -> new AppInfo(new WeatherApp(appBounds), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
-            default -> new AppInfo(new DebugBordersApp(appBounds, Color.BLUE), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
+                new AppInfo(new BoundingBoxTestApp(appBounds, new String[]{}), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
+            case WeatherAppShorthand -> new AppInfo(new WeatherApp(appBounds, new String[]{}), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
+            case PerformanceMonitorShorthand -> new AppInfo(new AppPerformanceMonitor(appBounds, new String[]{}), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
+            default -> new AppInfo(new DebugBordersApp(appBounds, Color.BLUE, new String[]{}), col, row, horizontalCellCount, verticalCellCount, optionalSaveSuffix);
         };
 
         FileHandle settingsFile = Gdx.files.external(AppSettingsFolder + info.getSaveFileName());

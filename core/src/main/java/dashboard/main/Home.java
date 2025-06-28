@@ -20,29 +20,33 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import dashboard.helper.AppLoader;
 import dashboard.helper.FontHelper;
 import dashboard.miscDataObjects.*;
-import dashboard.rendering.BoundingBox;
+import dashboard.rendering.graphs.BoundingBox;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 
 import static dashboard.miscDataObjects.AppInfo.APP_PADDING;
 
 /** First screen of the application. Displayed after the application is created. */
 public class Home implements Screen {
 
-    private static final String APP_VERSION = "1.0.3";
-    private static final String LAST_UPDATE_MESSAGE = "Add decimals to refresh timer";
+    private static final String APP_VERSION = "1.0.4";
+    private static final String LAST_UPDATE_MESSAGE = "Add line graph";
 
     private SpriteBatch spriteBatch;
     private ShapeRenderer shapeRenderer;
-    private List<AppInfo> apps;
+    private static List<AppInfo> apps;
     private HashSet<AppInfo> brokenApps;
     private Matrix4 matrix = new Matrix4();
     private BitmapFont debugFont;
     private AppInfo settingsOpened = null;
     private Stage stage;
+    private Random random;
+
+    public static final List<Stat> FPSHistory = new ArrayList<>();
 
     @Override
     public void show() {
@@ -50,7 +54,7 @@ public class Home implements Screen {
         shapeRenderer = new ShapeRenderer();
         spriteBatch = new SpriteBatch();
         debugFont = FontHelper.loadFont("fonts/Roboto-Regular.ttf", 12);
-
+        random = new Random();
         apps = new ArrayList<>();
         try {
             apps = AppLoader.loadAppsFromLayoutFile("layouts/testAppLayout.csv");
@@ -103,10 +107,14 @@ public class Home implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        long appTimeStart = 0;
+        long appTimeEnd = 0;
         for(AppInfo info : apps) {
             if (!brokenApps.contains(info)) {
+                appTimeStart = System.nanoTime();
                 updateApp(info, delta);
                 renderAppToFrameBuffer(info);
+                appTimeEnd = System.nanoTime();
             }
         }
 
@@ -130,7 +138,13 @@ public class Home implements Screen {
         debugFont.setColor(Color.CYAN);
         debugFont.draw(spriteBatch, String.join("\n", informationLines), 10, Gdx.graphics.getHeight() - 10);
         spriteBatch.end();
+
+        if (random.nextFloat() < 0.9f) {
+            FPSHistory.add(new Stat((float)(appTimeEnd - appTimeStart), System.currentTimeMillis()));
+        }
     }
+
+    private int lastValue = 50;
 
     private void renderSettings() {
         Gdx.input.setInputProcessor(stage);
@@ -149,6 +163,8 @@ public class Home implements Screen {
     private void updateApp(AppInfo info, float delta) {
         UpdateInfo updateInfo = new UpdateInfo();
         updateInfo.delta = delta;
+
+
 
         try {
             info.update();

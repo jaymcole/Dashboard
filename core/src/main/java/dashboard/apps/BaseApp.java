@@ -8,7 +8,7 @@ import dashboard.enums.TextVerticalAlignment;
 import dashboard.miscDataObjects.RenderInfo;
 import dashboard.miscDataObjects.TextParameters;
 import dashboard.miscDataObjects.UpdateInfo;
-import dashboard.rendering.BoundingBox;
+import dashboard.rendering.graphs.BoundingBox;
 import dashboard.rendering.TextBox;
 
 import java.util.HashMap;
@@ -22,7 +22,7 @@ public abstract class BaseApp implements IDashboardApp {
     private TextBox appNameTextBox;
     protected TextParameters textParameters;
 
-    public BaseApp(BoundingBox appBounds) {
+    public BaseApp(BoundingBox appBounds, String[] args) {
         textParameters = new TextParameters();
         textParameters.horizontalAlignment = TextHorizontalAlignment.CENTER;
         textParameters.verticalAlignment = TextVerticalAlignment.CENTER;

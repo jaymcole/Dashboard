@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import dashboard.apps.BaseApp;
 import dashboard.enums.TextHorizontalAlignment;
 import dashboard.enums.TextVerticalAlignment;
-import dashboard.rendering.BoundingBox;
+import dashboard.rendering.graphs.BoundingBox;
 import dashboard.rendering.TextBox;
 
 import java.util.ArrayList;
@@ -17,6 +17,7 @@ import static dashboard.helper.InputHelper.getMouseScreenPosition;
 
 public class AppInfo {
     public static final int APP_PADDING = 3;
+    public static final int MAX_STAT_RECORDS = 1000;
 
     // Used to separate save files for the same app
     // Example: you have two clock apps on your dashboard with different timezones. We'll want separate save files for the two different instances.

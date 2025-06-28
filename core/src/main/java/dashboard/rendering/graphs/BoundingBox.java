@@ -1,4 +1,4 @@
-package dashboard.rendering;
+package dashboard.rendering.graphs;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import dashboard.miscDataObjects.Coordinate2D;

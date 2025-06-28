@@ -6,7 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import dashboard.apps.BaseApp;
 import dashboard.miscDataObjects.RenderInfo;
 import dashboard.miscDataObjects.UpdateInfo;
-import dashboard.rendering.BoundingBox;
+import dashboard.rendering.graphs.BoundingBox;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,8 +16,8 @@ public class DebugBordersApp extends BaseApp {
 
     private Color debugColor;
 
-    public DebugBordersApp(BoundingBox appBounds, Color debugColor) {
-        super(appBounds);
+    public DebugBordersApp(BoundingBox appBounds, Color debugColor, String[] args) {
+        super(appBounds,args);
         this.debugColor = debugColor;
     }
 
