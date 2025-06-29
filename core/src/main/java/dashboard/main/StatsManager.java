@@ -9,6 +9,8 @@ import java.util.Map;
 
 public class StatsManager {
 
+    public static final int MAX_RECORDS_PER_SOURCE = 10000;
+
     private static Map<String, List<Stat>> stats = new HashMap<>();
 
     public static List<Stat> getStatList(String statsKey) {
@@ -20,7 +22,11 @@ public class StatsManager {
     }
 
     public static void AddStatRecord(String statsKey, float value) {
-        getStatList(statsKey).add(new Stat(value, System.currentTimeMillis()));
+        List<Stat> stats = getStatList(statsKey);
+        stats.add(new Stat(value, System.currentTimeMillis()));
+        if (stats.size() > MAX_RECORDS_PER_SOURCE) {
+            stats.remove(0);
+        }
     }
 
     public static void clearStatRecords(String statsKey) {

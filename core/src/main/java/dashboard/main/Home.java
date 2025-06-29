@@ -33,8 +33,8 @@ import static dashboard.miscDataObjects.AppInfo.APP_PADDING;
 /** First screen of the application. Displayed after the application is created. */
 public class Home implements Screen {
 
-    private static final String APP_VERSION = "1.0.7";
-    private static final String LAST_UPDATE_MESSAGE = "Autoscale performance graph";
+    private static final String APP_VERSION = "1.0.8";
+    private static final String LAST_UPDATE_MESSAGE = "Exclude performance graph from metrics";
 
     private SpriteBatch spriteBatch;
     private ShapeRenderer shapeRenderer;
@@ -101,7 +101,7 @@ public class Home implements Screen {
     }
 
     private float timeSinceLastStatSave = 0;
-    private float statSaveFrequency = 0.05f;
+    private float statSaveFrequency = 0.01f;
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -112,10 +112,10 @@ public class Home implements Screen {
                 long appTimeStart = System.nanoTime();
                 updateApp(info, delta);
                 renderAppToFrameBuffer(info);
-                long appTimeEnd = System.nanoTime();
+                long elapsedNanos = System. nanoTime() - appTimeStart;
 
                 if (timeSinceLastStatSave > statSaveFrequency) {
-                    StatsManager.AddStatRecord(info.uniqueAppName + "_renderTime",(float)(appTimeEnd - appTimeStart));
+                    StatsManager.AddStatRecord(info.uniqueAppName + "_renderTime",(float)(elapsedNanos));
                 }
             }
         }

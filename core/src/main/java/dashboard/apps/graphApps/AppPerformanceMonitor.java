@@ -23,6 +23,8 @@ public class AppPerformanceMonitor extends BaseApp {
     private BoundingBox graphBounds;
     private List<String> suffixes;
     private List<String> dataSources;
+    private List<String> excludedSources;
+    private List<String> excludeSourcesWithPrefix;
     private final int yCeiling;
     private final boolean autoscaleGraph;
     private Map<String, List<Stat>> dataSourceLists = new HashMap<>();
@@ -32,6 +34,8 @@ public class AppPerformanceMonitor extends BaseApp {
         yCeiling = (int)configs.appArgs.getOrDefault("yCeiling", 1);
         suffixes = (List<String>)configs.appArgs.getOrDefault("dataSourcesWithSuffix", new ArrayList<String>());
         dataSources = (List<String>)configs.appArgs.getOrDefault("dataSources", new ArrayList<String>());
+        excludeSourcesWithPrefix = (List<String>)configs.appArgs.getOrDefault("excludeSourcesWithPrefix", new ArrayList<String>());
+        excludedSources = (List<String>)configs.appArgs.getOrDefault("excludedSources", new ArrayList<String>());
         autoscaleGraph = (boolean)configs.appArgs.getOrDefault("autoscaling", false);
 
         new Thread(new Runnable() {
@@ -83,6 +87,10 @@ public class AppPerformanceMonitor extends BaseApp {
 
     private void refreshDataSources() {
         dataSourceLists = new HashMap<>();
+        if (dataSourceLists == null) {
+        } else {
+            dataSourceLists.clear();
+        }
         if (suffixes != null) {
             for(String suffix : suffixes) {
                 dataSourceLists.putAll(StatsManager.getAllStatsWithSuffix(suffix));
@@ -92,6 +100,22 @@ public class AppPerformanceMonitor extends BaseApp {
         if (dataSources != null) {
             for(String dataSource : dataSources) {
                 dataSourceLists.putAll(StatsManager.getAllStatsWithSuffix(dataSource));
+            }
+        }
+
+        // Remove excluded sources
+        if (excludeSourcesWithPrefix != null) {
+            for(Map.Entry<String, List<Stat>> entry : dataSourceLists.entrySet()) {
+                for(String dataSource : excludeSourcesWithPrefix) {
+                    if (entry.getKey().startsWith(dataSource)) {
+                        excludedSources.add(entry.getKey());
+                    }
+                }
+            }
+        }
+        if (excludedSources != null) {
+            for (String dataSource : excludedSources) {
+                dataSourceLists.remove(dataSource);
             }
         }
     }
